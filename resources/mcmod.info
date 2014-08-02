@@ -1,0 +1,16 @@
+[
+{
+  "modid": "xan_personalizedRecipes",
+  "name": "Personalized Recipes",
+  "description": "A mod that allows you or your server host to add custom recipes to Minecraft!",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Xandayn"],
+  "credits": "TheBoo for his Custom Recipes mod, which inspired me to make my own.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
