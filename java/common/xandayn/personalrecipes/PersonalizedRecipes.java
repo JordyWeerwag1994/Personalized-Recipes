@@ -49,7 +49,7 @@ public class PersonalizedRecipes {
     public static final String MOD_ID = "xan_personalizedRecipes";
     public static final String CHANNEL_ID = "xan_prChannel";
     public static final String MOD_NAME = "Personalized Recipes";
-    public static final String MOD_VERSION = "1.7.10-0.2.133";
+    public static final String MOD_VERSION = "1.7.10-1.0.0";
     public static final String MOD_DEPENDENCIES = "after:*";
     public static boolean ALLOW_NON_OP_COMMANDS;
 
