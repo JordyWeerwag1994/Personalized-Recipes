@@ -47,7 +47,6 @@ public class RecipeCreatorGui extends GuiContainer{
     private ResourceLocation background;
     private EntityPlayer player;
     private RecipeCreatorContainer container;
-    private ArrayList<Integer> disabledSlots = new ArrayList<>();
     private boolean removeMode;
 
     //Remove mode variables
@@ -120,19 +119,12 @@ public class RecipeCreatorGui extends GuiContainer{
                 ItemStack toUse = null;
 
                 if (playerStack != null) {
-                    if (container.getRecipeComponent().allowSlotDisabling() && disabledSlots.contains(slot - 600))
-                        return;
-                    if (!container.getRecipeComponent().isSlotOutput(slot - 600)) {
+                    if (!container.getRecipeComponent().isSlotOutput(slot - 600) && !container.getRecipeComponent().allowMultipleItemsInSlot()) {
                         toUse = playerStack.copy();
                         toUse.stackSize = 1;
                     } else {
                         toUse = playerStack.copy();
                     }
-                } else if (container.getRecipeComponent().allowSlotDisabling() && !container.getRecipeComponent().isSlotOutput(slot - 600) && container.getStackInSlot(slot - 600) == null) {
-                    if (disabledSlots.contains(slot - 600))
-                        disabledSlots.remove(new Integer(slot - 600));
-                    else
-                        disabledSlots.add(slot - 600);
                 }
                 container.setInventorySlotContents(slot, toUse);
             }
@@ -163,7 +155,7 @@ public class RecipeCreatorGui extends GuiContainer{
                     }
                 }
                 if (!noOutput) {
-                    IRecipe recipe = container.getRecipeComponent().compileRecipe(recipeData, disabledSlots);
+                    IRecipe recipe = container.getRecipeComponent().compileRecipe(recipeData);
                     RecipeRegistry.registerRecipe(container.getRecipeComponent().getCraftingAlias(), recipe);
                     if (PersonalizedRecipes.CURRENT_SIDE.isServer())
                         NetworkHandler.NETWORK.sendToServer(new ServerReceiveRecipePacket(recipe, container.getRecipeComponent().getCraftingAlias(), Minecraft.getMinecraft().thePlayer.getDisplayName()));
@@ -205,12 +197,6 @@ public class RecipeCreatorGui extends GuiContainer{
     @Override
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_) {
         this.fontRendererObj.drawString(container.getRecipeComponent().getInventoryName(), 5, 5, 0x404040);
-        if (container.getRecipeComponent().allowSlotDisabling()) {
-            Slot[] s = container.getRecipeComponent().getCraftingInventorySlots();
-            for (int i = 0; i < disabledSlots.size(); i++) {
-                drawRect(s[disabledSlots.get(i)].xDisplayPosition, s[disabledSlots.get(i)].yDisplayPosition, s[disabledSlots.get(i)].xDisplayPosition + 17, s[disabledSlots.get(i)].yDisplayPosition + 17, 0x5D191919);
-            }
-        }
     }
 
     private void updateRecipe(){

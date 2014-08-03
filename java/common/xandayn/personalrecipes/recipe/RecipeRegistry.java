@@ -1,14 +1,8 @@
 package common.xandayn.personalrecipes.recipe;
 
 import common.xandayn.personalrecipes.PersonalizedRecipes;
-import common.xandayn.personalrecipes.common.container.component.IRecipeContainerComponent;
-import common.xandayn.personalrecipes.common.container.component.ShapedRecipeContainerComponent;
-import common.xandayn.personalrecipes.common.container.component.ShapelessRecipeContainerComponent;
-import common.xandayn.personalrecipes.common.container.component.SmeltingRecipeContainerComponent;
-import common.xandayn.personalrecipes.recipe.handlers.FurnaceRecipeHandler;
-import common.xandayn.personalrecipes.recipe.handlers.ShapedRecipeHandler;
-import common.xandayn.personalrecipes.recipe.handlers.ICustomRecipeHandler;
-import common.xandayn.personalrecipes.recipe.handlers.ShapelessRecipeHandler;
+import common.xandayn.personalrecipes.common.container.component.*;
+import common.xandayn.personalrecipes.recipe.handlers.*;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -56,6 +50,7 @@ public class RecipeRegistry {
         registerRecipeHandler("shaped", ShapedRecipeHandler.class, new ShapedRecipeContainerComponent());
         registerRecipeHandler("shapeless", ShapelessRecipeHandler.class, new ShapelessRecipeContainerComponent());
         registerRecipeHandler("smelting", FurnaceRecipeHandler.class, new SmeltingRecipeContainerComponent());
+        registerRecipeHandler("fuel", FuelRecipeHandler.class, new FuelRecipeContainerComponent()); //TODO: Add the RecipeContainerComponent!!!
     }
 
     public static void registerRecipeHandler(String alias, Class<? extends ICustomRecipeHandler> handlerClass, IRecipeContainerComponent component){

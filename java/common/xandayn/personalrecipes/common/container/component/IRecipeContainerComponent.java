@@ -47,8 +47,8 @@ public interface IRecipeContainerComponent {
     boolean isSlotOutput(int slot);
     int getCraftingSlotCount();
     public String getCraftingAlias();
-    public IRecipe compileRecipe(ItemStack[] data, ArrayList<Integer> disabledSlots);
-    public boolean allowSlotDisabling();
+    public IRecipe compileRecipe(ItemStack[] data);
+    public boolean allowMultipleItemsInSlot();
     public void addRecipeToCraftingWindow(IRecipe recipe, ItemStack[] table);
 
 }

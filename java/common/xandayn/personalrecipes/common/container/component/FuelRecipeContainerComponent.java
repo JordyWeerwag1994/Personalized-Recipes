@@ -1,20 +1,19 @@
 package common.xandayn.personalrecipes.common.container.component;
 
+import common.xandayn.personalrecipes.recipe.FuelRecipe;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.ArrayList;
-
 /**
- * PersonalizedRecipes - ShapelessRecipeContainerComponent
+ * PersonalizedRecipes - FuelRecipeContainerComponent
  *
- * A class that defines a shapeless component for the RecipeCreatorGui.
+ * A class that defines a fuel component for the RecipeCreatorGui.
  *
  * @license
  *   Copyright (C) 2014  xandayn
@@ -34,7 +33,7 @@ import java.util.ArrayList;
  *
  * @author xandayn
  */
-public class ShapelessRecipeContainerComponent implements IRecipeContainerComponent {
+public class FuelRecipeContainerComponent implements IRecipeContainerComponent {
 
     private Slot[] cSlots;
     private Slot[] pSlots;
@@ -45,12 +44,8 @@ public class ShapelessRecipeContainerComponent implements IRecipeContainerCompon
         cSlots = new Slot[getCraftingSlotCount()];
         pSlots = new Slot[36];
 
-        for(int i = 0; i < getCraftingSlotCount()-1; i++){
-            int row = i / 3;
-            int column = i % 3;
-            cSlots[i] = new Slot(invSlots, i, 30 + (column*18), 17 + (row * 18));
-        }
-        cSlots[getCraftingSlotCount()-1] = new Slot(invSlots, 9, 124, 35);
+        cSlots[0] = new Slot(invSlots, 0, 56, 53);
+        cSlots[1] = new Slot(invSlots, 1, 116, 34);
 
         for (int i = 0; i < 9; i++) {
             pSlots[i] = new Slot(playerSlots, i, (8 + 18 * i), 142);
@@ -73,7 +68,7 @@ public class ShapelessRecipeContainerComponent implements IRecipeContainerCompon
 
     @Override
     public ResourceLocation getGuiBackground() {
-        return new ResourceLocation("textures/gui/container/crafting_table.png");
+        return new ResourceLocation("textures/gui/container/furnace.png");
     }
 
     @Override
@@ -88,7 +83,7 @@ public class ShapelessRecipeContainerComponent implements IRecipeContainerCompon
 
     @Override
     public String getInventoryName() {
-        return "Shapeless Recipe Creator";
+        return "Fuel Recipe Creator";
     }
 
     @Override
@@ -98,29 +93,22 @@ public class ShapelessRecipeContainerComponent implements IRecipeContainerCompon
 
     @Override
     public boolean isSlotOutput(int slot) {
-        return slot == 9;
+        return slot == 1;
     }
 
     @Override
     public int getCraftingSlotCount() {
-        return 10;
+        return 2;
     }
 
     @Override
     public String getCraftingAlias() {
-        return "shapeless";
+        return "fuel";
     }
 
     @Override
     public IRecipe compileRecipe(ItemStack[] data) {
-        ItemStack output = data[9];
-        ArrayList<ItemStack> items = new ArrayList<>();
-        for(int i = 0; i < data.length - 1; i++){
-            if(data[i] != null){
-                items.add(data[i].copy());
-            }
-        }
-        return new ShapelessRecipes(output, items);
+        return new FuelRecipe(data[0], data[1].stackSize);
     }
 
     @Override
@@ -130,13 +118,10 @@ public class ShapelessRecipeContainerComponent implements IRecipeContainerCompon
 
     @Override
     public void addRecipeToCraftingWindow(IRecipe recipe, ItemStack[] table) {
-        ShapelessRecipes sRecipe = (ShapelessRecipes)recipe;
-        int i = 0;
-        for(Object r : sRecipe.recipeItems){
-            ItemStack item = (ItemStack)r;
-            table[i] = item;
-            i++;
+        if(recipe != null && recipe instanceof FuelRecipe) {
+            FuelRecipe fRecipe = (FuelRecipe) recipe;
+            table[0] = fRecipe.getRecipeOutput();
+            table[1] = new ItemStack(Blocks.dirt, fRecipe.getBurnTime() / 200);
         }
-        table[9] = sRecipe.getRecipeOutput();
     }
 }

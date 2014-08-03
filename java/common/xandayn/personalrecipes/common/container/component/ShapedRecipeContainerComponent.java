@@ -113,7 +113,7 @@ public class ShapedRecipeContainerComponent implements IRecipeContainerComponent
     }
 
     @Override
-    public IRecipe compileRecipe(ItemStack[] data, ArrayList<Integer> disabledSlots) {
+    public IRecipe compileRecipe(ItemStack[] data) {
         ArrayList<ItemStack> compiledRecipe = new ArrayList<>();
         for(int i = 0; i < data.length - 1; i++){
             compiledRecipe.add(data[i] == null ? null : data[i].copy());
@@ -123,7 +123,7 @@ public class ShapedRecipeContainerComponent implements IRecipeContainerComponent
     }
 
     @Override
-    public boolean allowSlotDisabling() {
+    public boolean allowMultipleItemsInSlot() {
         return false;
     }
 

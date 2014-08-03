@@ -111,12 +111,12 @@ public class SmeltingRecipeContainerComponent implements IRecipeContainerCompone
     }
 
     @Override
-    public IRecipe compileRecipe(ItemStack[] data, ArrayList<Integer> disabledSlots) {
+    public IRecipe compileRecipe(ItemStack[] data) {
         return new FurnaceRecipe(data[1], data[0], 0f);
     }
 
     @Override
-    public boolean allowSlotDisabling() {
+    public boolean allowMultipleItemsInSlot() {
         return false;
     }
 
