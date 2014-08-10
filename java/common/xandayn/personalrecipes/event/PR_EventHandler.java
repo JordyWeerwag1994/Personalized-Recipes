@@ -51,7 +51,6 @@ public class PR_EventHandler {
 
     @SubscribeEvent
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event){
-        System.out.println("Test " + FMLCommonHandler.instance().getSide());
         NetworkHandler.NETWORK.sendTo(new ClientRemoveRecipeFromServer(true), (EntityPlayerMP)event.player);
         if(FMLCommonHandler.instance().getSide().isClient()) {
             PersonalizedRecipes.CURRENT_SIDE = Side.CLIENT;
