@@ -8,6 +8,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.util.Rectangle;
 
 /**
  * @license
@@ -35,12 +36,8 @@ import net.minecraft.util.ResourceLocation;
  */
 public class RecipeHandlerGUI extends GuiContainer {
 
-    /**
-     * A constant defining how many recipe handler
-     * selection buttons can go on a page.
-     */
-    private static final int _SELECTION_BUTTONS_PER_PAGE = 4;
-
+    private static final int _STRING_HEIGHT = 9;
+    private static final int _STRINGS_WITHOUT_SCROLL = 7;
     /**
      * An enumeration to define what our current state is,
      * if we've just opened the inventory and haven't selected
@@ -48,14 +45,22 @@ public class RecipeHandlerGUI extends GuiContainer {
      */
     private GUIState _curState;
 
-    private GuiButton next, previous;
-
     private ResourceLocation background;
-    private String[] aliases;
-    private int page = 0, lastPage = 0;
-    private final int pageCount;
     private IRecipeGUIComponent component = null;
     private EntityPlayer player;
+
+    //JUST_OPENED state variables
+    private String[] aliases;
+    private boolean sliding, scrollEnabled;
+    private int mouseLastY;
+    private int scrollValue;
+    private int arrayOffset;
+    private int selected = -1;
+    private Rectangle slider;
+    private Rectangle[] selections;
+    private GuiButton selectButton;
+
+    private int sliderScroll = 0, maxSliderScroll;
 
     private enum GUIState {
         JUST_OPENED,
@@ -77,58 +82,66 @@ public class RecipeHandlerGUI extends GuiContainer {
     public RecipeHandlerGUI(EntityPlayer player) {
         super(new RH_Container());
         _curState = GUIState.JUST_OPENED;
-        pageCount = (RecipeRegistry.registeredRecipeHandlerCount() / _SELECTION_BUTTONS_PER_PAGE) + 1;
         background = new ResourceLocation(References.MOD_ID.toLowerCase(), "textures/gui/handler_selector.png");
-        xSize = 127;
-        ySize = 91;
+        xSize = 172;
+        ySize = 128;
         aliases = RecipeRegistry.getRegisteredAliases().toArray(new String[RecipeRegistry.registeredRecipeHandlerCount()]);
         this.player = player;
+        maxSliderScroll = 61;
+        scrollEnabled =  aliases.length >= _STRINGS_WITHOUT_SCROLL;
+        int hiddenAliases = scrollEnabled ? aliases.length - _STRINGS_WITHOUT_SCROLL : 0;
+        scrollValue = hiddenAliases == 0 ? 0 : maxSliderScroll / hiddenAliases;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void initGui() {
         super.initGui();
-        createButtons();
+        slider = new Rectangle(guiLeft + 81, guiTop + 29, 10, 9);
+        selections = new Rectangle[_STRINGS_WITHOUT_SCROLL];
+        for(int i = 0; i < selections.length; i++){
+            int yOffset = i * 9;
+            selections[i] = new Rectangle(23 + guiLeft, (29 + yOffset) + guiTop, 58, 9);
+        }
+        buttonList.add(selectButton = new GuiButton(0, guiLeft + 110, guiTop + 37, 39, 20, "Select"));
+        buttonList.add(new GuiButton(1, guiLeft + 110, guiTop + 71, 39, 20, "Exit"));
     }
 
-    /**
-     * A function to recreate buttons when the page is changed if _curState == JUST_OPENED
-     */
-    @SuppressWarnings("unchecked")
-    private void createButtons(){
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
         switch (_curState){
             case JUST_OPENED:
-                buttonList.clear();
-                buttonList.add(previous = new GuiButton(0, 42 + guiLeft, 71 + guiTop, 9, 9, "<"));
-                buttonList.add(next = new GuiButton(1, 76 + guiLeft, 71 + guiTop, 9, 9, ">"));
-                previous.enabled = page != 0;
-                next.enabled = pageCount > 0 && page != pageCount;
-                buttonList.add(makeButton(2, 20 + guiLeft, 20 + guiTop, 35, 16, 0));
-                buttonList.add(makeButton(3, 72 + guiLeft, 20 + guiTop, 35, 16, 1));
-                buttonList.add(makeButton(4, 20 + guiLeft, 51 + guiTop, 35, 16, 2));
-                buttonList.add(makeButton(5, 72 + guiLeft, 51 + guiTop, 35, 16, 3));
+                for(int i = 0; i < selections.length; i++){
+                    if(selections[i].contains(mouseX, mouseY)){
+                        selected = selected == i + arrayOffset ? -1 : i + arrayOffset;
+                        break;
+                    }
+                }
                 break;
         }
     }
 
-    /**
-     * The function that creates a button with the correct displayString
-     * @param id The ID of the button
-     * @param x The x position of the button
-     * @param y The y position of the button
-     * @param width The width of the button
-     * @param height The height of the button
-     * @param position The position of the button (0-3) used to determine if the button is set to an alias or disabled.
-     * @return A GuiButton that is either linked to a CustomRecipeHandler or is disabled.
-     *
-     * @see net.minecraft.client.gui.GuiButton
-     * @see common.xandayn.personalrecipes.recipe.RecipeRegistry#getRegisteredAliases()
-     */
-    private GuiButton makeButton(int id, int x, int y, int width, int height, int position){
-        int key = page * _SELECTION_BUTTONS_PER_PAGE + position;
-        GuiButton toReturn = new GuiButton(id, x, y, width, height, key > aliases.length - 1 ? "None" : aliases[key]);
-        if(toReturn.displayString.equals("None")) toReturn.enabled = false;
-        return toReturn;
+    @Override
+    protected void mouseClickMove(int mouseX, int mouseY, int mouseButton, long timeSinceClick) {
+        super.mouseClickMove(mouseX, mouseY, mouseButton, timeSinceClick);
+        switch (_curState){
+            case JUST_OPENED:
+                slider.grow(0, 3);
+                sliding = slider.contains(mouseX, mouseY - sliderScroll) && scrollEnabled;
+                slider.grow(0, -3);
+                break;
+        }
+    }
+
+    @Override
+    protected void mouseMovedOrUp(int mouseX, int mouseY, int mouseButton) {
+        super.mouseMovedOrUp(mouseX, mouseY, mouseButton);
+        switch (_curState){
+            case JUST_OPENED:
+                break;
+        }
+        sliding = false;
     }
 
     @Override
@@ -137,35 +150,13 @@ public class RecipeHandlerGUI extends GuiContainer {
             case JUST_OPENED:
                 switch (button.id){
                     case 0:
-                        page--;
-                        if(page == 0) {
-                            button.enabled = false;
+                        if(selected > -1){
+                            System.out.println(aliases[selected]);
                         }
                         break;
                     case 1:
-                        page++;
-                        if(page == pageCount - 1){
-                            button.enabled = false;
-                        }
-                        break;
-                    default:
-                        int id = RecipeRegistry.getAliasIntID(button.displayString);
-                        System.out.println(id + " " + button.displayString);
                         player.closeScreen();
                         break;
-                }
-                break;
-        }
-    }
-
-    @Override
-    public void updateScreen() {
-        super.updateScreen();
-        switch (_curState){
-            case JUST_OPENED:
-                if(page != lastPage){
-                    lastPage = page;
-                    createButtons();
                 }
                 break;
             case TYPE_SELECTED:
@@ -175,16 +166,58 @@ public class RecipeHandlerGUI extends GuiContainer {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_) {
+    public void updateScreen() {
+        super.updateScreen();
+        switch (_curState){
+            case JUST_OPENED:
+                selectButton.enabled = selected != -1;
+                break;
+            case TYPE_SELECTED:
+
+                break;
+        }
+    }
+
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float delta, int mouseX, int mouseY) {
         Minecraft.getMinecraft().renderEngine.bindTexture(background);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-//        switch (_curState){
-//            case JUST_OPENED:
-//
-//                break;
-//            case TYPE_SELECTED:
-//
-//                break;
-//        }
+        switch (_curState){
+            case JUST_OPENED:
+                int mouseDeltaY = mouseY - mouseLastY;
+                mouseLastY = mouseY;
+                drawTexturedModalRect(slider.getX(), slider.getY() + sliderScroll, 172, scrollEnabled ? 0 : slider.getHeight(), slider.getWidth(), slider.getHeight());
+                if(sliding){
+                    sliderScroll += mouseDeltaY;
+                    if(sliderScroll < 0) sliderScroll = 0;
+                    if(sliderScroll > maxSliderScroll) sliderScroll = maxSliderScroll;
+                }
+                if(selected - arrayOffset >= 0 && selected - arrayOffset < selections.length){
+                    drawTexturedModalRect(selections[selected - arrayOffset].getX(), selections[selected - arrayOffset].getY(), 182, 0, selections[selected - arrayOffset].getWidth(), selections[selected - arrayOffset].getHeight());
+                }
+                break;
+            case TYPE_SELECTED:
+
+                break;
+        }
+    }
+
+    @Override
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        switch (_curState){
+            case JUST_OPENED:
+                if(!scrollEnabled)
+                    for(int i = 0; i < aliases.length; i++) {
+                        drawString(fontRendererObj, aliases[i], 24, 30 + (i * _STRING_HEIGHT), 0xFFFFFFFF);
+                    }
+                else {
+                    arrayOffset = sliderScroll / scrollValue;
+                    for(int i = 0; i < _STRINGS_WITHOUT_SCROLL; i++){
+                        if(i + arrayOffset >= aliases.length) break;
+                        drawString(fontRendererObj, aliases[i + arrayOffset], 24, 30 + (i * _STRING_HEIGHT), 0xFFFFFFFF);
+                    }
+                }
+                break;
+        }
     }
 }

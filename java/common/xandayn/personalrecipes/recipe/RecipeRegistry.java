@@ -53,10 +53,15 @@ public class RecipeRegistry {
         _HANDLER_HASHES = new HashMap<>();
 
         registerRecipeHandler("Shaped", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("asd", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("123", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("456", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("789", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Furnace", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Shapeless", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        //The following are Temporary test recipe handlers.
+        registerRecipeHandler("Shaped1", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Furnace1", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Shapeless1", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Shaped2", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Furnace2", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Shapeless2", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
     }
 
     /**
