@@ -1,6 +1,6 @@
 package common.xandayn.personalrecipes.recipe.handler;
 
-import common.xandayn.personalrecipes.client.gui.IRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.IRecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.CustomRecipeHandler;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
 import common.xandayn.personalrecipes.recipe.data.ShapedRecipeData;

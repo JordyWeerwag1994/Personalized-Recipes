@@ -1,5 +1,7 @@
 package common.xandayn.personalrecipes.recipe;
 
+import common.xandayn.personalrecipes.client.gui.recipe.IRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.ShapedRecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
 import common.xandayn.personalrecipes.recipe.handler.ShapedRecipeHandler;
 
@@ -35,10 +37,12 @@ import java.util.Set;
  * THE SOFTWARE.
  */
 public class RecipeRegistry {
+
     /**
      * The backing HashMap for recipe registration.
      */
     private static HashMap<String, CustomRecipeHandler> _RECIPE_HANDLERS;
+
     /**
      * A HashMap containing a String value, with an Integer key, where key = value.hashCode(),
      * this gives a way to convert an integer value to a CustomRecipeHandler.
@@ -52,16 +56,9 @@ public class RecipeRegistry {
         _RECIPE_HANDLERS = new HashMap<>();
         _HANDLER_HASHES = new HashMap<>();
 
-        registerRecipeHandler("Shaped", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("Furnace", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Shaped", new ShapedRecipeHandler(new ShapedRecipeGUIComponent())); //TODO: create an IRecipeGUIComponent and use it instead of null
         registerRecipeHandler("Shapeless", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        //The following are Temporary test recipe handlers.
-        registerRecipeHandler("Shaped1", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("Furnace1", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("Shapeless1", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("Shaped2", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("Furnace2", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("Shapeless2", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Furnace", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
     }
 
     /**
@@ -69,7 +66,7 @@ public class RecipeRegistry {
      * multiple times under different aliases, however, aliases must be unique, and never repeated. Registration should occur during
      * FMLPreInitialization.
      *
-     * @param alias The name to associate the recipeHandler with.
+     * @param alias The name to associate the recipeHandler with, should be 10 or less characters.
      * @param recipeHandler A class extending CustomRecipeHandler, used when registering a recipe for the alias supplied.
      *
      * @throws java.lang.RuntimeException If parameter alias is already registered.
@@ -83,7 +80,7 @@ public class RecipeRegistry {
             _HANDLER_HASHES.put(alias.hashCode(), alias);
             return;
         }
-        throw new RuntimeException("Cannot register \"" + alias + "\", it is already registered.");
+        throw new RuntimeException("Cannot register alias: \"" + alias + "\", alias is already registered.");
     }
 
     /**
@@ -141,5 +138,9 @@ public class RecipeRegistry {
 
     public static Set<String> getRegisteredAliases(){
         return _RECIPE_HANDLERS.keySet();
+    }
+
+    public static IRecipeGUIComponent getRecipeGUIComponent(int aliasIntID) {
+        return _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(aliasIntID)).getGUIComponent();
     }
 }
