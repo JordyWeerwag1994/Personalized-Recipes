@@ -1,4 +1,7 @@
-package common.xandayn.personalrecipes.client.gui;
+package common.xandayn.personalrecipes.client.gui.recipe;
+
+import common.xandayn.personalrecipes.client.gui.RecipeHandlerGUI;
+import net.minecraft.client.gui.GuiButton;
 
 /**
  * @license
@@ -25,5 +28,12 @@ package common.xandayn.personalrecipes.client.gui;
  * THE SOFTWARE.
  */
 public interface IRecipeGUIComponent {
-
+    public void initGUI(RecipeHandlerGUI gui);
+    public void actionPerformed(GuiButton button);
+    public void renderBackground(float delta, int mouseX, int mouseY);
+    public void renderForeground(int mouseX, int mouseY);
+    public void mousePressed(int mouseX, int mouseY, int mouseButton);
+    public void mousePressedAndDragged(int mouseX, int mouseY, int mouseButton, long timeSincePress);
+    public void mouseReleased(int mouseX, int mouseY, int mouseButton);
+    public void updateScreen();
 }
