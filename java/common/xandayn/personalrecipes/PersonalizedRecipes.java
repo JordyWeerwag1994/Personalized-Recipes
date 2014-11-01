@@ -2,7 +2,7 @@ package common.xandayn.personalrecipes;
 
 import common.xandayn.personalrecipes.command.RecipeCommand;
 import common.xandayn.personalrecipes.common.GuiHandler;
-import common.xandayn.personalrecipes.lib.References;
+import common.xandayn.personalrecipes.util.References;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;

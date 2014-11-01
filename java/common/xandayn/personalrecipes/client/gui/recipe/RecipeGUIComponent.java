@@ -1,24 +1,49 @@
 package common.xandayn.personalrecipes.client.gui.recipe;
 
 import common.xandayn.personalrecipes.client.gui.RecipeHandlerGUI;
-import common.xandayn.personalrecipes.client.gui.component.GUISlot;
+import common.xandayn.personalrecipes.client.gui.component.GUIComponent;
+import common.xandayn.personalrecipes.util.Rendering;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
 
-public abstract class RecipeGUIComponent implements IRecipeGUIComponent {
+/**
+ * Copyright (c) 2014 Matthew DePalma
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+public abstract class RecipeGUIComponent {
 
     protected int guiLeft = 0, guiTop = 0;
     protected int xSize, ySize;
-    protected int width;
-    protected int height;
+    protected ResourceLocation texture;
     protected RecipeHandlerGUI gui;
+    protected ArrayList<GuiButton> buttonList;
 
-    protected ArrayList<GUISlot> slots;
+    protected ArrayList<GUIComponent> slots;
 
-    @Override
+    public RecipeGUIComponent() {
+        buttonList = new ArrayList<>();
+    }
+
     public void initGUI(RecipeHandlerGUI gui) {
         this.slots = new ArrayList<>();
         this.gui = gui;
@@ -26,39 +51,52 @@ public abstract class RecipeGUIComponent implements IRecipeGUIComponent {
         this.guiTop = (gui.height - this.ySize) / 2;
     }
 
-    @Override
-    public void renderBackground(float delta, int mouseX, int mouseY) { }
-
-    @Override
-    public void renderForeground(int mouseX, int mouseY) {
-        for(GUISlot slot : slots) {
-            slot.render(guiLeft, guiTop, mouseX, mouseY);
+    public void renderBackground(int mouseX, int mouseY) {
+        Rendering.bindTexture(texture);
+        Rendering.drawTexturedRectangle(guiLeft, guiTop, 0, 0, xSize, ySize);
+        for(GUIComponent component : slots){
+            component.renderBackground(mouseX, mouseY);
         }
     }
 
-    @Override
+    public void renderForeground(int mouseX, int mouseY) {
+        for(GUIComponent slot : slots) {
+            slot.renderForeground(mouseX, mouseY);
+        }
+        for(GuiButton button : buttonList) {
+            button.drawButton(Minecraft.getMinecraft(), mouseX, mouseY);
+        }
+    }
+
     public void mousePressed(int mouseX, int mouseY, int mouseButton) {
-        for(GUISlot slot : slots){
-            if(slot.contains(mouseX - guiLeft, mouseY - guiTop)) {
-                //TODO: Add in a dialog to set the item.
-                if(slot.isEmpty()){
-                    slot.setItem(new ItemStack(Items.gold_ingot, 10));
-                } else {
-                    slot.setItem(null);
-                }
+        for(GuiButton button : buttonList) {
+            if(button.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)){
+                button.func_146113_a(Minecraft.getMinecraft().getSoundHandler());
+                actionPerformed(button);
+                break;
             }
         }
+        for(GUIComponent component : slots){
+            component.mousePressed(mouseX, mouseY, mouseButton);
+        }
     }
 
-    @Override
-    public void mouseReleased(int mouseX, int mouseY, int mouseButton) { }
+    public void mouseReleased(int mouseX, int mouseY, int mouseButton) {
+        for(GUIComponent component : slots){
+            component.mouseReleased(mouseX, mouseY, mouseButton);
+        }
+    }
 
-    @Override
-    public void mousePressedAndDragged(int mouseX, int mouseY, int mouseButton, long timeSincePress) { }
+    public void mousePressedAndDragged(int mouseX, int mouseY, int mouseButton, long timeSincePress) {
+        for(GUIComponent component : slots){
+            component.mousePressedAndDragged(mouseX, mouseY, mouseButton, timeSincePress);
+        }
+    }
 
-    @Override
-    public void actionPerformed(GuiButton button) { }
+    public void update(int mouseX, int mouseY){
+    }
 
-    @Override
-    public void updateScreen() { }
+    public abstract void actionPerformed(GuiButton button);
+
+    public boolean keyTyped(char value, int keyCode) { return false; }
 }

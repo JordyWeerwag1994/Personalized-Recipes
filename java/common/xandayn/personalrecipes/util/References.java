@@ -1,4 +1,6 @@
-package common.xandayn.personalrecipes.lib;
+package common.xandayn.personalrecipes.util;
+
+import net.minecraft.util.ResourceLocation;
 
 /**
  * @license
@@ -29,4 +31,6 @@ public class References {
     public static final String MOD_NAME = "Personalized Recipes";
     public static final String MOD_VERSION = "1.7.10-2.0.0";
     public static final String MOD_DEPENDENCIES = "after:*";
+
+    public static final ResourceLocation GUI_COMPONENTS = new ResourceLocation(References.MOD_ID.toLowerCase(), "textures/gui/component/gui_components.png");
 }

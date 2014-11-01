@@ -1,17 +1,16 @@
 package common.xandayn.personalrecipes.client.gui;
 
-import common.xandayn.personalrecipes.client.gui.recipe.IRecipeGUIComponent;
-import common.xandayn.personalrecipes.lib.References;
+import common.xandayn.personalrecipes.client.gui.component.GUISlidingList;
+import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.RecipeRegistry;
-import net.minecraft.client.Minecraft;
+import common.xandayn.personalrecipes.util.References;
+import common.xandayn.personalrecipes.util.Rendering;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.Rectangle;
 
 /**
  * @license
@@ -39,38 +38,31 @@ import org.lwjgl.util.Rectangle;
  */
 public class RecipeHandlerGUI extends GuiContainer {
 
-    private static final int _STRING_HEIGHT = 9;
-    private static final int _STRINGS_WITHOUT_SCROLL = 7;
     /**
      * An enumeration to define what our current state is,
      * if we've just opened the inventory and haven't selected
      * a recipe handler, or if we've selected a handler to use.
      */
-    private GUIState _curState;
-
-    private ResourceLocation background;
-    private IRecipeGUIComponent component = null;
-    private EntityPlayer player;
-
-    //JUST_OPENED state variables
-    private String[] aliases;
-    private boolean sliding, slideEnabled;
-    private int mouseLastY;
-    private int scrollValue;
-    private int arrayOffset;
-    private int selected = -1;
-    private Rectangle slider;
-    private Rectangle selectionBox;
-    private Rectangle[] selections;
-    private GuiButton selectButton;
-    private GuiButton exitButton;
-
-    private int sliderScroll = 0, maxSliderScroll;
-
     private enum GUIState {
         JUST_OPENED,
         TYPE_SELECTED
     }
+
+    private GUIState _curState;
+    /**
+     * A resource location pointing to the texture we want to renderBackground.
+     */
+    private ResourceLocation background;
+    /**
+     *
+     */
+    private RecipeGUIComponent component = null;
+    private EntityPlayer player;
+    private GUISlidingList slider;
+
+    //JUST_OPENED state variables
+    private GuiButton selectButton;
+    private GuiButton exitButton;
 
     /**
      * A basic implementation of the Container class, the only reason this
@@ -90,15 +82,19 @@ public class RecipeHandlerGUI extends GuiContainer {
         background = new ResourceLocation(References.MOD_ID.toLowerCase(), "textures/gui/handler_selector.png");
         xSize = 172;
         ySize = 128;
-        aliases = RecipeRegistry.getRegisteredAliases().toArray(new String[RecipeRegistry.registeredRecipeHandlerCount()]);
         this.player = player;
-        maxSliderScroll = 61;
-        slideEnabled =  aliases.length >= _STRINGS_WITHOUT_SCROLL;
     }
 
     @Override
-    public void setWorldAndResolution(Minecraft mc, int width, int height) {
-        super.setWorldAndResolution(mc, width, height);
+    protected void keyTyped(char value, int keyCode) {
+        switch (_curState){
+            case TYPE_SELECTED:
+                if(!component.keyTyped(value, keyCode)) super.keyTyped(value, keyCode);
+                break;
+            default:
+                super.keyTyped(value, keyCode);
+                break;
+        }
     }
 
     @Override
@@ -112,13 +108,7 @@ public class RecipeHandlerGUI extends GuiContainer {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         switch (_curState){
             case JUST_OPENED:
-                for(int i = 0; i < selections.length; i++){
-                    if(i >= aliases.length) break;
-                    if(selections[i].contains(mouseX, mouseY)){
-                        selected = selected == i + arrayOffset ? -1 : i + arrayOffset;
-                        break;
-                    }
-                }
+                slider.mousePressed(mouseX, mouseY, mouseButton);
                 break;
             case TYPE_SELECTED:
                 component.mousePressed(mouseX, mouseY, mouseButton);
@@ -131,9 +121,7 @@ public class RecipeHandlerGUI extends GuiContainer {
         super.mouseClickMove(mouseX, mouseY, mouseButton, timeSinceClick);
         switch (_curState){
             case JUST_OPENED:
-                slider.grow(0, 3);
-                sliding = slider.contains(mouseX, mouseY - sliderScroll);
-                slider.grow(0, -3);
+                slider.mousePressedAndDragged(mouseX, mouseY, mouseButton, timeSinceClick);
                 break;
             case TYPE_SELECTED:
                 component.mousePressedAndDragged(mouseX, mouseY, mouseButton, timeSinceClick);
@@ -143,25 +131,16 @@ public class RecipeHandlerGUI extends GuiContainer {
 
     private void startTypeSelectedState(){
         buttonList.clear();
-        component = RecipeRegistry.getRecipeGUIComponent(RecipeRegistry.getAliasIntID(aliases[selected]));
+        component = RecipeRegistry.getRecipeGUIComponent(RecipeRegistry.getAliasIntID(slider.getSelected()));
         _curState = GUIState.TYPE_SELECTED;
         component.initGUI(this);
     }
 
     private void initialize() {
-        _curState = GUIState.JUST_OPENED;
-        int hiddenAliases = slideEnabled ? aliases.length - _STRINGS_WITHOUT_SCROLL : 0;
-        scrollValue = hiddenAliases == 0 ? 0 : maxSliderScroll / hiddenAliases;
         buttonList.clear();
+        _curState = GUIState.JUST_OPENED;
         component = null;
-        selected = -1;
-        slider = new Rectangle(guiLeft + 81, guiTop + 29, 10, 9);
-        selections = new Rectangle[_STRINGS_WITHOUT_SCROLL];
-        for(int i = 0; i < selections.length; i++){
-            int yOffset = i * 9;
-            selections[i] = new Rectangle(23 + guiLeft, (29 + yOffset) + guiTop, 58, 9);
-        }
-        selectionBox = new Rectangle(guiLeft + 23, guiTop + 29, 58, 70);
+        slider = new GUISlidingList(guiLeft + 20, guiTop + 26, RecipeRegistry.getRegisteredAliases().toArray(new String[RecipeRegistry.registeredRecipeHandlerCount()]));
         registerGuiButton(selectButton = new GuiButton(0, guiLeft + 110, guiTop + 37, 39, 20, "Select"));
         registerGuiButton(exitButton = new GuiButton(1, guiLeft + 110, guiTop + 71, 39, 20, "Exit"));
         exitButton.enabled = false;
@@ -172,7 +151,7 @@ public class RecipeHandlerGUI extends GuiContainer {
         super.mouseMovedOrUp(mouseX, mouseY, mouseButton);
         switch (_curState){
             case JUST_OPENED:
-                sliding = false;
+                slider.mouseReleased(mouseX, mouseY, mouseButton);
                 break;
             case TYPE_SELECTED:
                 component.mouseReleased(mouseX, mouseY, mouseButton);
@@ -186,7 +165,7 @@ public class RecipeHandlerGUI extends GuiContainer {
             case JUST_OPENED:
                 switch (button.id){
                     case 0:
-                        if(selected > -1){
+                        if(slider.getSelected() != null){
                             startTypeSelectedState();
                         }
                         break;
@@ -206,11 +185,8 @@ public class RecipeHandlerGUI extends GuiContainer {
         super.updateScreen();
         switch (_curState){
             case JUST_OPENED:
-                selectButton.enabled = selected != -1;
+                selectButton.enabled = slider.getSelected() != null;
                 if(exitButton != null && !exitButton.enabled) exitButton.enabled = true;
-                break;
-            case TYPE_SELECTED:
-                component.updateScreen();
                 break;
         }
     }
@@ -219,28 +195,14 @@ public class RecipeHandlerGUI extends GuiContainer {
     protected void drawGuiContainerBackgroundLayer(float delta, int mouseX, int mouseY) {
         switch (_curState){
             case JUST_OPENED:
-                Minecraft.getMinecraft().renderEngine.bindTexture(background);
+                Rendering.bindTexture(background);
                 drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-                int mouseDeltaY = mouseY - mouseLastY;
-                mouseLastY = mouseY;
-                drawTexturedModalRect(slider.getX(), slider.getY() + sliderScroll, 172, slideEnabled ? 0 : slider.getHeight(), slider.getWidth(), slider.getHeight());
-                if(slideEnabled) {
-                    if (sliding) {
-                        sliderScroll += mouseDeltaY;
-                        if (sliderScroll < 0) sliderScroll = 0;
-                        if (sliderScroll > maxSliderScroll) sliderScroll = maxSliderScroll;
-                    } else if(selectionBox.contains(mouseX, mouseY)) {
-                        sliderScroll -= (Mouse.getDWheel() / 30);
-                        if (sliderScroll < 0) sliderScroll = 0;
-                        if (sliderScroll > maxSliderScroll) sliderScroll = maxSliderScroll;
-                    }
-                }
-                if(selected - arrayOffset >= 0 && selected - arrayOffset < selections.length){
-                    drawTexturedModalRect(selections[selected - arrayOffset].getX(), selections[selected - arrayOffset].getY(), 182, 0, selections[selected - arrayOffset].getWidth(), selections[selected - arrayOffset].getHeight());
-                }
+                slider.update(mouseX, mouseY);
+                slider.renderBackground(mouseX, mouseY);
                 break;
             case TYPE_SELECTED:
-                component.renderBackground(delta, mouseX, mouseY);
+                component.update(mouseX, mouseY);
+                component.renderBackground(mouseX, mouseY);
                 break;
         }
     }
@@ -249,21 +211,16 @@ public class RecipeHandlerGUI extends GuiContainer {
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         switch (_curState) {
             case JUST_OPENED:
-                drawString(fontRendererObj, "Select a Recipe Handler", 28, 6, 0xFFEEEEEE);
-                if(selected != -1) {
-                    drawString(fontRendererObj, "Selected: " + aliases[selected], 34, 106, 0xFFEEEEEE);
+                Rendering.drawString("Select a Recipe Handler", 28, 6, 0xFFDDDDDD);
+
+                if(slider.getSelected() != null) {
+                    Rendering.drawString("Selected: " + slider.getSelected(), 32, 108, 0xFFDDDDDD);
                 }
-                if(!slideEnabled)
-                    for(int i = 0; i < aliases.length; i++) {
-                        drawString(fontRendererObj, aliases[i].length() > 10 ? aliases[i].substring(0, 8).concat("...") : aliases[i], 24, 30 + (i * _STRING_HEIGHT), 0xFFFFFFFF);
-                    }
-                else {
-                    arrayOffset = sliderScroll / scrollValue;
-                    for(int i = 0; i < _STRINGS_WITHOUT_SCROLL; i++){
-                        if(i + arrayOffset >= aliases.length) break;
-                        drawString(fontRendererObj, aliases[i + arrayOffset].length() > 10 ? aliases[i + arrayOffset].substring(0, 8).concat("...") : aliases[i + arrayOffset], 24, 30 + (i * _STRING_HEIGHT), 0xFFFFFFFF);
-                    }
-                }
+
+                GL11.glPushMatrix();
+                GL11.glTranslatef(-guiLeft, -guiTop, 0);
+                slider.renderForeground(mouseX, mouseY);
+                GL11.glPopMatrix();
                 break;
             case TYPE_SELECTED:
                 GL11.glPushMatrix();
@@ -274,15 +231,7 @@ public class RecipeHandlerGUI extends GuiContainer {
         }
     }
 
-    public int getSizeX(){
-        return xSize;
-    }
-
-    public int getSizeY(){
-        return ySize;
-    }
-
-    public void clearButtonList(){
+    public void clearGuiButtons(){
         buttonList.clear();
     }
 

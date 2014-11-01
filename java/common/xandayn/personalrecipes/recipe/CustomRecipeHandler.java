@@ -1,6 +1,6 @@
 package common.xandayn.personalrecipes.recipe;
 
-import common.xandayn.personalrecipes.client.gui.recipe.IRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
 
 
@@ -33,12 +33,12 @@ import common.xandayn.personalrecipes.recipe.data.RecipeData;
  */
 public abstract class CustomRecipeHandler {
 
-    private final IRecipeGUIComponent guiComponent;
+    private final RecipeGUIComponent guiComponent;
 
     /**
      * @param guiComponent The IRecipeGUIComponent to associate with this class.
      */
-    public CustomRecipeHandler(IRecipeGUIComponent guiComponent){
+    public CustomRecipeHandler(RecipeGUIComponent guiComponent){
         this.guiComponent = guiComponent;
     }
 
@@ -77,9 +77,9 @@ public abstract class CustomRecipeHandler {
     /**
      * @return The IRecipeGUIComponent associated with this CustomRecipeHandler
      *
-     * @see common.xandayn.personalrecipes.client.gui.recipe.IRecipeGUIComponent
+     * @see common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent
      */
-    public final IRecipeGUIComponent getGUIComponent() {
+    public final RecipeGUIComponent getGUIComponent() {
         return guiComponent;
     }
 }

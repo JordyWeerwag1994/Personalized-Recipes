@@ -1,6 +1,6 @@
 package common.xandayn.personalrecipes.command;
 
-import common.xandayn.personalrecipes.lib.References;
+import common.xandayn.personalrecipes.util.References;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -55,7 +55,6 @@ public class RecipeCommand implements ICommand {
             sender.addChatMessage(new ChatComponentText("This command must be sent by a player ingame."));
             return;
         }
-        EntityPlayer player = (EntityPlayer)sender;
         ((EntityPlayer) sender).openGui(References.MOD_ID, 0, null, 0, 0, 0);
     }
 

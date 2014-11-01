@@ -1,7 +1,8 @@
 package common.xandayn.personalrecipes.recipe;
 
-import common.xandayn.personalrecipes.client.gui.recipe.IRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
 import common.xandayn.personalrecipes.client.gui.recipe.ShapedRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.TestRecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
 import common.xandayn.personalrecipes.recipe.handler.ShapedRecipeHandler;
 
@@ -56,9 +57,9 @@ public class RecipeRegistry {
         _RECIPE_HANDLERS = new HashMap<>();
         _HANDLER_HASHES = new HashMap<>();
 
-        registerRecipeHandler("Shaped", new ShapedRecipeHandler(new ShapedRecipeGUIComponent())); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("Shapeless", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("Furnace", new ShapedRecipeHandler(null)); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Shaped", new ShapedRecipeHandler(new ShapedRecipeGUIComponent()));
+        registerRecipeHandler("Shapeless", new ShapedRecipeHandler(new TestRecipeGUIComponent())); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler("Furnace", new ShapedRecipeHandler(new TestRecipeGUIComponent())); //TODO: create an IRecipeGUIComponent and use it instead of null
     }
 
     /**
@@ -140,7 +141,7 @@ public class RecipeRegistry {
         return _RECIPE_HANDLERS.keySet();
     }
 
-    public static IRecipeGUIComponent getRecipeGUIComponent(int aliasIntID) {
+    public static RecipeGUIComponent getRecipeGUIComponent(int aliasIntID) {
         return _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(aliasIntID)).getGUIComponent();
     }
 }

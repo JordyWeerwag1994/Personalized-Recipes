@@ -1,6 +1,6 @@
 package common.xandayn.personalrecipes.recipe.handler;
 
-import common.xandayn.personalrecipes.client.gui.recipe.IRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.CustomRecipeHandler;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
 import common.xandayn.personalrecipes.recipe.data.ShapedRecipeData;
@@ -38,9 +38,9 @@ public class ShapedRecipeHandler extends CustomRecipeHandler{
 
     ArrayList<ShapedRecipes> recipes;
     /**
-     * @param guiComponent The IRecipeGUIComponent to associate with this class.
+     * @param guiComponent The RecipeGUIComponent to associate with this class.
      */
-    public ShapedRecipeHandler(IRecipeGUIComponent guiComponent) {
+    public ShapedRecipeHandler(RecipeGUIComponent guiComponent) {
         super(guiComponent);
         recipes = new ArrayList<>();
     }
