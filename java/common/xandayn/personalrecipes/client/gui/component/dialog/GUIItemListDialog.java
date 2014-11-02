@@ -4,10 +4,12 @@ import common.xandayn.personalrecipes.client.gui.component.GUISearchableSlidingL
 import common.xandayn.personalrecipes.client.gui.component.GUISlot;
 import common.xandayn.personalrecipes.client.gui.component.GUITextField;
 import common.xandayn.personalrecipes.util.References;
+import common.xandayn.personalrecipes.util.Util;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+
+import java.util.ArrayList;
 
 public class GUIItemListDialog extends GUIDialog<ItemStack> {
     private GUISearchableSlidingList itemList;
@@ -15,27 +17,24 @@ public class GUIItemListDialog extends GUIDialog<ItemStack> {
     private GUISlot slot;
     private GUITextField itemCount;
     private int stackSize;
-    ItemStack[] items;
-    String[] names;
+    ArrayList<ItemStack> items;
+    ArrayList<String> names;
 
     public GUIItemListDialog(int x, int y, int stackSize){
         super(x, y, 128, 86);
         this.stackSize = stackSize;
-        names = new String[Item.itemRegistry.getKeys().size()];
-        items = new ItemStack[names.length];
-        int i = 0;
-        for(Object o : Item.itemRegistry){
-            items[i] = new ItemStack((Item)o);
-            names[i] = items[i].getDisplayName();
-            i++;
+        items = Util.getAllItemsAndBlocks();
+        names = new ArrayList<>(items.size());
+        for(ItemStack item : items){
+            names.add(item.getDisplayName());
         }
         texture = new ResourceLocation(References.MOD_ID.toLowerCase(), "textures/gui/dialog/item_list_dialog.png");
-        itemList = new GUISearchableSlidingList(x + 4, y + 5, x + 79, y + 4, 44, names);
+        itemList = new GUISearchableSlidingList(x + 4, y + 5, x + 79, y + 4, 44, names.toArray(new String[names.size()]));
         buttonList.add(submit = new GuiButton(1, x + 79, y + 53, 44, 14, "Submit"));
         buttonList.add(new GuiButton(2, x + 79, y + 68, 44, 14, "Cancel"));
         slot = new GUISlot(x + 83, y + 20, stackSize);
         itemCount = new GUITextField(x + 102, y + 21, 21, 2, null);
-        itemCount.setAllowed('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+        itemCount.setAllowed(GUITextField.NUMERIC_ONLY);
     }
 
     @Override
@@ -44,14 +43,21 @@ public class GUIItemListDialog extends GUIDialog<ItemStack> {
         submit.enabled = itemList.getSelected() != null;
         itemList.update(mouseX, mouseY);
         itemCount.update(mouseX, mouseY);
+        if(itemCount.getText() != null){
+            int count = Integer.parseInt(itemCount.getText());
+            if(count > slot.getItem().getMaxStackSize())
+                itemCount.setText(String.valueOf(slot.getItem().getMaxStackSize()));
+            else if(count > stackSize)
+                itemCount.setText(String.valueOf(stackSize));
+        }
     }
 
     @Override
     public void reset() {
         super.reset();
-        itemList = new GUISearchableSlidingList(x + 4, y + 5, x + 79, y + 4, 44, names);
+        itemList = new GUISearchableSlidingList(x + 4, y + 5, x + 79, y + 4, 44, names.toArray(new String[names.size()]));
         itemCount = new GUITextField(x + 102, y + 21, 21, 2, null);
-        itemCount.setAllowed('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
+        itemCount.setAllowed(GUITextField.NUMERIC_ONLY);
         slot.setItem(null);
     }
 
@@ -99,13 +105,9 @@ public class GUIItemListDialog extends GUIDialog<ItemStack> {
         super.renderForeground(mouseX, mouseY);
         itemList.renderForeground(mouseX, mouseY);
         itemCount.renderForeground(mouseX, mouseY);
+        slot.renderForeground(mouseX, mouseY);
         if(itemList.getSelected() != null) {
-            for (int i = 0; i < names.length; i++) {
-                if (this.itemList.getSelected().equals(names[i])) {
-                    slot.setItem(items[i]);
-                    break;
-                }
-            }
+            slot.setItem(items.get(names.indexOf(itemList.getSelected())));
         } else {
             slot.setItem(null);
         }

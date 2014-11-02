@@ -2,7 +2,6 @@ package common.xandayn.personalrecipes.client.gui.component;
 
 import common.xandayn.personalrecipes.util.Rendering;
 import net.minecraft.item.ItemStack;
-import org.lwjgl.opengl.GL11;
 
 /**
  * Copyright (c) 2014 Matthew DePalma
@@ -42,19 +41,19 @@ public class GUISlot extends GUIComponent {
 
     @Override
     public void renderBackground(int mouseX, int mouseY) {
-        GL11.glColor3f(1, 1, 1);
         if(active) {
             if (contains(mouseX, mouseY))
                 Rendering.drawColoredRectangle(x, y, _GUI_SLOT_SIZE, _GUI_SLOT_SIZE, 0xC6, 0xC6, 0xC6);
-            if (item != null)
-                Rendering.drawItem(x, y, item);
         } else {
             Rendering.drawColoredRectangle(x, y, _GUI_SLOT_SIZE, _GUI_SLOT_SIZE, 0x55, 0x55, 0x55);
         }
     }
 
     @Override
-    public void renderForeground(int mouseX, int mouseY) { }
+    public void renderForeground(int mouseX, int mouseY) {
+        if (item != null)
+            Rendering.drawItem(x, y, item);
+    }
 
     public void setItem(ItemStack item){
         if(item != null) {

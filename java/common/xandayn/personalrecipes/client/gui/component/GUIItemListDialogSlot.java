@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiButton;
 public class GUIItemListDialogSlot extends GUISlot {
 
     private GUIItemListDialog dialog;
-    private boolean wasOpen = false;
+    public boolean wasOpen = false;
 
     public GUIItemListDialogSlot(int x, int y, int dialogX, int dialogY, int stackLimit) {
         super(x, y, stackLimit);

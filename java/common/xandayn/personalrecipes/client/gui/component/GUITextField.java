@@ -13,10 +13,17 @@ public class GUITextField extends GUIComponent {
 
     public static final int MINIMUM_TEXT_FIELD_WIDTH = 14;
 
-    private static final Character[] _DEFAULT_ALLOWED = {
+    public static final Character[] DEFAULT_ALLOWED = {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ,
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '};
+    public static final Character[] NUMERIC_ONLY = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+    };
+    public static final Character[] ALPHABET_ONLY = {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '
+    };
 
     private static final String CARET = "|";
     private static final int _TEXT_FIELD_HEIGHT = 14;
@@ -28,7 +35,7 @@ public class GUITextField extends GUIComponent {
     private StringBuilder contents;
     private boolean wasCleared = false;
     private int limit;
-    private List<Character> allowed = Arrays.asList(_DEFAULT_ALLOWED);
+    private List<Character> allowed = Arrays.asList(DEFAULT_ALLOWED);
 
     public GUITextField(int x, int y, int width, String defaultText){
         this(x, y, width, -1, defaultText);
@@ -123,7 +130,6 @@ public class GUITextField extends GUIComponent {
     }
 
     public void setText(String text){
-        active = false;
         contents = new StringBuilder(text);
     }
 

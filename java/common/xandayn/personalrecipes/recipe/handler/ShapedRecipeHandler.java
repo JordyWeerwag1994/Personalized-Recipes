@@ -1,10 +1,11 @@
 package common.xandayn.personalrecipes.recipe.handler;
 
-import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.ShapedRecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.CustomRecipeHandler;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
 import common.xandayn.personalrecipes.recipe.data.ShapedRecipeData;
 import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.ShapedRecipes;
 
@@ -34,31 +35,32 @@ import java.util.ArrayList;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class ShapedRecipeHandler extends CustomRecipeHandler{
+public class ShapedRecipeHandler extends CustomRecipeHandler<ShapedRecipes> {
 
-    ArrayList<ShapedRecipes> recipes;
-    /**
-     * @param guiComponent The RecipeGUIComponent to associate with this class.
-     */
-    public ShapedRecipeHandler(RecipeGUIComponent guiComponent) {
-        super(guiComponent);
-        recipes = new ArrayList<>();
+    ArrayList<ShapedRecipes> recipes = new ArrayList<>();
+    public ShapedRecipeHandler() {
+        super(new ShapedRecipeGUIComponent());
     }
 
     @Override
     public String getID() {
-        return "shaped";
+        return "Shaped";
     }
 
     @Override
     public void registerRecipe(RecipeData recipeData) {
         ShapedRecipeData realData = (ShapedRecipeData)recipeData;
-        addRecipe(new ShapedRecipes(realData.getWidth(), realData.getHeight(), realData.itemInputs, realData.itemOutputs[0]));
+        addRecipe(new ShapedRecipes(realData.getWidth(), realData.getHeight(), realData.itemInputs.toArray(new ItemStack[realData.itemInputs.size()]), realData.itemOutputs.get(0)));
     }
 
     @Override
     public void deleteRecipe(int position) {
         removeRecipe(recipes.get(position));
+    }
+
+    @Override
+    public ArrayList<ShapedRecipes> getRecipes() {
+        return recipes;
     }
 
     @Override

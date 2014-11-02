@@ -3,6 +3,8 @@ package common.xandayn.personalrecipes.recipe;
 import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
 
+import java.util.ArrayList;
+
 
 /**
  * An abstract class defining what is required to make a custom recipe handler.
@@ -31,7 +33,7 @@ import common.xandayn.personalrecipes.recipe.data.RecipeData;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public abstract class CustomRecipeHandler {
+public abstract class CustomRecipeHandler<T> {
 
     private final RecipeGUIComponent guiComponent;
 
@@ -60,6 +62,8 @@ public abstract class CustomRecipeHandler {
      * @param position The position of the recipe to remove.
      */
     public abstract void deleteRecipe(int position);
+
+    public abstract ArrayList<T> getRecipes();
 
     /**
      * @return The number of recipes registered with the current Handler.

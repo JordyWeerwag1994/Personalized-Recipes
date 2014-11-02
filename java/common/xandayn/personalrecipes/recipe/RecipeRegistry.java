@@ -1,10 +1,11 @@
 package common.xandayn.personalrecipes.recipe;
 
 import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
-import common.xandayn.personalrecipes.client.gui.recipe.ShapedRecipeGUIComponent;
-import common.xandayn.personalrecipes.client.gui.recipe.TestRecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
+import common.xandayn.personalrecipes.recipe.handler.FuelRecipeHandler;
 import common.xandayn.personalrecipes.recipe.handler.ShapedRecipeHandler;
+import common.xandayn.personalrecipes.recipe.handler.ShapelessRecipeHandler;
+import common.xandayn.personalrecipes.recipe.handler.SmeltingRecipeHandler;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -57,9 +58,10 @@ public class RecipeRegistry {
         _RECIPE_HANDLERS = new HashMap<>();
         _HANDLER_HASHES = new HashMap<>();
 
-        registerRecipeHandler("Shaped", new ShapedRecipeHandler(new ShapedRecipeGUIComponent()));
-        registerRecipeHandler("Shapeless", new ShapedRecipeHandler(new TestRecipeGUIComponent())); //TODO: create an IRecipeGUIComponent and use it instead of null
-        registerRecipeHandler("Furnace", new ShapedRecipeHandler(new TestRecipeGUIComponent())); //TODO: create an IRecipeGUIComponent and use it instead of null
+        registerRecipeHandler(new ShapedRecipeHandler());
+        registerRecipeHandler(new ShapelessRecipeHandler());
+        registerRecipeHandler(new FuelRecipeHandler());
+        registerRecipeHandler(new SmeltingRecipeHandler());
     }
 
     /**
@@ -67,21 +69,21 @@ public class RecipeRegistry {
      * multiple times under different aliases, however, aliases must be unique, and never repeated. Registration should occur during
      * FMLPreInitialization.
      *
-     * @param alias The name to associate the recipeHandler with, should be 10 or less characters.
      * @param recipeHandler A class extending CustomRecipeHandler, used when registering a recipe for the alias supplied.
      *
-     * @throws java.lang.RuntimeException If parameter alias is already registered.
+     * @throws java.lang.RuntimeException If CustomRecipeHandler.getID() is already registered.
      *
      * @see CustomRecipeHandler
+     * @see CustomRecipeHandler#getID()
      * @see cpw.mods.fml.common.event.FMLPreInitializationEvent
      */
-    public static void registerRecipeHandler(String alias, CustomRecipeHandler recipeHandler) {
-        if(!_RECIPE_HANDLERS.containsKey(alias)){
-            _RECIPE_HANDLERS.put(alias, recipeHandler);
-            _HANDLER_HASHES.put(alias.hashCode(), alias);
+    public static void registerRecipeHandler(CustomRecipeHandler recipeHandler) {
+        if(!_RECIPE_HANDLERS.containsKey(recipeHandler.getID())){
+            _RECIPE_HANDLERS.put(recipeHandler.getID(), recipeHandler);
+            _HANDLER_HASHES.put(recipeHandler.getID().hashCode(), recipeHandler.getID());
             return;
         }
-        throw new RuntimeException("Cannot register alias: \"" + alias + "\", alias is already registered.");
+        throw new RuntimeException("Cannot register alias: \"" + recipeHandler.getID() + "\", alias is already registered.");
     }
 
     /**

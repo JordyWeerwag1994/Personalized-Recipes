@@ -2,6 +2,7 @@ package common.xandayn.personalrecipes.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
@@ -35,17 +36,15 @@ public class Rendering {
     private static final double _UV_MULT = 0.00390625;
 
     public static void drawItem(int x, int y, ItemStack item){
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glPushMatrix();
-        GL11.glTranslatef(0, 0, 32);
         _RENDER_ITEM.zLevel = 200;
         FontRenderer font = item.getItem().getFontRenderer(item);
         if (font == null) font = Minecraft.getMinecraft().fontRenderer;
+        RenderHelper.enableGUIStandardItemLighting();
         _RENDER_ITEM.renderItemAndEffectIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), item, x, y);
         if(item.stackSize > 1)
             _RENDER_ITEM.renderItemOverlayIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), item, x, y, Integer.toString(item.stackSize));
+        RenderHelper.disableStandardItemLighting();
         _RENDER_ITEM.zLevel = 0;
-        GL11.glPopMatrix();
     }
 
     public static void drawColoredRectangle(int x, int y, int width, int height, int r, int g, int b){

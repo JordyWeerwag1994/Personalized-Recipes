@@ -38,14 +38,16 @@ public abstract class RecipeGUIComponent {
     protected RecipeHandlerGUI gui;
     protected ArrayList<GuiButton> buttonList;
 
-    protected ArrayList<GUIComponent> slots;
+    protected ArrayList<GUIComponent> components;
 
     public RecipeGUIComponent() {
-        buttonList = new ArrayList<>();
+        this.buttonList = new ArrayList<>();
+        this.components = new ArrayList<>();
     }
 
     public void initGUI(RecipeHandlerGUI gui) {
-        this.slots = new ArrayList<>();
+        buttonList.clear();
+        components.clear();
         this.gui = gui;
         this.guiLeft = (gui.width - this.xSize) / 2;
         this.guiTop = (gui.height - this.ySize) / 2;
@@ -54,13 +56,13 @@ public abstract class RecipeGUIComponent {
     public void renderBackground(int mouseX, int mouseY) {
         Rendering.bindTexture(texture);
         Rendering.drawTexturedRectangle(guiLeft, guiTop, 0, 0, xSize, ySize);
-        for(GUIComponent component : slots){
+        for(GUIComponent component : components){
             component.renderBackground(mouseX, mouseY);
         }
     }
 
     public void renderForeground(int mouseX, int mouseY) {
-        for(GUIComponent slot : slots) {
+        for(GUIComponent slot : components) {
             slot.renderForeground(mouseX, mouseY);
         }
         for(GuiButton button : buttonList) {
@@ -76,24 +78,27 @@ public abstract class RecipeGUIComponent {
                 break;
             }
         }
-        for(GUIComponent component : slots){
+        for(GUIComponent component : components){
             component.mousePressed(mouseX, mouseY, mouseButton);
         }
     }
 
     public void mouseReleased(int mouseX, int mouseY, int mouseButton) {
-        for(GUIComponent component : slots){
+        for(GUIComponent component : components){
             component.mouseReleased(mouseX, mouseY, mouseButton);
         }
     }
 
     public void mousePressedAndDragged(int mouseX, int mouseY, int mouseButton, long timeSincePress) {
-        for(GUIComponent component : slots){
+        for(GUIComponent component : components){
             component.mousePressedAndDragged(mouseX, mouseY, mouseButton, timeSincePress);
         }
     }
 
     public void update(int mouseX, int mouseY){
+        for(GUIComponent component : components){
+            component.update(mouseX, mouseY);
+        }
     }
 
     public abstract void actionPerformed(GuiButton button);

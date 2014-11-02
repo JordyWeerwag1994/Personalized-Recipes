@@ -1,7 +1,10 @@
 package common.xandayn.personalrecipes.recipe.data;
 
+import common.xandayn.personalrecipes.recipe.RecipeRegistry;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
+
+import java.util.ArrayList;
 
 /**
  * A class defining information required to make a recipe, extend if extra information is needed.
@@ -37,23 +40,28 @@ public class RecipeData {
     /**
      * An array containing all the required item inputs, leave null if not needed
      */
-    public ItemStack[] itemInputs = null;
+    public ArrayList<ItemStack> itemInputs = null;
     /**
      * An array containing all the required item outputs, leave null if not needed
      */
-    public ItemStack[] itemOutputs = null;
+    public ArrayList<ItemStack> itemOutputs = null;
     /**
      * An array containing all the required fluid inputs, leave null if not needed
      */
-    public FluidStack[] fluidInputs = null;
+    public ArrayList<FluidStack> fluidInputs = null;
     /**
      * An array containing all the required fluid outputs, leave null if not needed
      */
-    public FluidStack[] fluidOutputs = null;
+    public ArrayList<FluidStack> fluidOutputs = null;
 
     public RecipeData(String recipeType){
         this.recipeType = recipeType;
     }
+
+    /**
+     * A function that causes this recipe to register itself.
+     */
+    public final void register() { RecipeRegistry.registerRecipe(RecipeRegistry.getAliasIntID(recipeType), this); }
 
     /**
      * @return The alias associated with a CustomRecipeHandler that can parse this recipe.

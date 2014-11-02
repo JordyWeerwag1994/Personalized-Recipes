@@ -37,12 +37,11 @@ public class ShapedRecipeData extends RecipeData {
     private final int height;
 
     /**
-     * @param recipeType The alias associated with a CustomRecipeHandler that can parse this recipe.
      * @param width The width of the recipe.
      * @param height The height of the recipe.
      */
-    public ShapedRecipeData(String recipeType, int width, int height) {
-        super(recipeType);
+    public ShapedRecipeData(int width, int height) {
+        super("Shaped");
         this.width = width;
         this.height = height;
     }
