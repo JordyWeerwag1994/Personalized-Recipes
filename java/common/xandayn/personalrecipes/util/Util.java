@@ -2,6 +2,7 @@ package common.xandayn.personalrecipes.util;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.ArrayList;
 
@@ -31,13 +32,53 @@ import java.util.ArrayList;
  */
 public class Util {
 
+    private static ArrayList<ItemStack> items;
+    private static boolean initialized = false;
+
     public static ArrayList<ItemStack> getAllItemsAndBlocks(){
-        ArrayList<ItemStack> allItems = new ArrayList<>();
-        for(Object o : Item.itemRegistry){
-            Item i = (Item)o;
-            i.getSubItems(i, i.getCreativeTab(), allItems);
+        if(!initialized) {
+            initialized = true;
+            items = new ArrayList<>();
+            for (Object o : Item.itemRegistry) {
+                Item i = (Item) o;
+                i.getSubItems(i, i.getCreativeTab(), items);
+            }
         }
-        return allItems;
+        return items;
+    }
+
+    public static Item getItemByUnlocalizedName(String unlocalizedName){
+        ArrayList<ItemStack> items = getAllItemsAndBlocks();
+        for(ItemStack item : items) {
+            if(item.getUnlocalizedName().equals(unlocalizedName))
+                return item.getItem();
+        }
+        return null;
+    }
+
+    public static void writeItemStackToNBT(NBTTagCompound tag, ItemStack item){
+        if(item != null) {
+            tag.setString("name", item.getUnlocalizedName());
+            tag.setInteger("damage", item.getItemDamage());
+            tag.setInteger("count", item.stackSize);
+            if(item.hasTagCompound())
+                tag.setTag("data", item.getTagCompound());
+        } else {
+            tag.setString("name", "null");
+        }
+    }
+
+    public static ItemStack readItemStackFromNBT(NBTTagCompound tag){
+        String name = tag.getString("name");
+        if(!name.equals("null")) {
+            int damage = tag.getInteger("damage");
+            int count = tag.getInteger("count");
+            NBTTagCompound data = tag.hasKey("data") ? tag.getCompoundTag("data") : null;
+            ItemStack toReturn = new ItemStack(getItemByUnlocalizedName(name), count, damage);
+            toReturn.setTagCompound(data);
+            return toReturn;
+        }
+        return null;
     }
 
 }

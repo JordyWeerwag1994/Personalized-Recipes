@@ -4,11 +4,14 @@ import common.xandayn.personalrecipes.client.gui.recipe.FuelRecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.CustomRecipeHandler;
 import common.xandayn.personalrecipes.recipe.data.FuelRecipeData;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
+import common.xandayn.personalrecipes.util.Util;
 import cpw.mods.fml.common.IFuelHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @license
@@ -73,9 +76,48 @@ public class FuelRecipeHandler extends CustomRecipeHandler<FuelRecipeData> imple
     }
 
     @Override
+    public void writeToNBT(NBTTagCompound tagCompound) {
+        NBTTagCompound fuel = new NBTTagCompound();
+        fuel.setInteger("count", getRecipeCount());
+        for(int i = 0; i < getRecipeCount(); i++) {
+            NBTTagCompound iterator = new NBTTagCompound();
+            FuelRecipeData data = recipes.get(i);
+            NBTTagCompound input = new NBTTagCompound();
+            Util.writeItemStackToNBT(input, data.itemInputs.get(0));
+            iterator.setInteger("burnTime", data.burnTime);
+            iterator.setTag("input", input);
+            fuel.setTag(String.valueOf(i), iterator);
+        }
+        tagCompound.setTag("Fuel", fuel);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tagCompound) {
+        if(tagCompound.hasKey("Fuel")){
+            NBTTagCompound fuel = tagCompound.getCompoundTag("Fuel");
+            int count = fuel.getInteger("count");
+            for(int i = 0; i < count; i++) {
+                NBTTagCompound iterator = fuel.getCompoundTag(String.valueOf(i));
+                int burnTime = iterator.getInteger("burnTime");
+                NBTTagCompound input = iterator.getCompoundTag("input");
+                ItemStack item = Util.readItemStackFromNBT(input);
+                FuelRecipeData data = new FuelRecipeData();
+                data.burnTime = burnTime;
+                data.itemInputs = new ArrayList<>(Arrays.asList(item));
+                addRecipe(data);
+            }
+        }
+    }
+
+    @Override
+    public void clear() {
+        recipes.clear();
+    }
+
+    @Override
     public int getBurnTime(ItemStack fuel) {
         for(FuelRecipeData data : recipes){
-            if(ItemStack.areItemStacksEqual(data.itemInputs.get(0), fuel)){
+            if(data.itemInputs.get(0).getItem().equals(fuel.getItem()) && (data.itemInputs.get(0).getItemDamage() == fuel.getItemDamage() || fuel.isItemStackDamageable())){
                 return data.burnTime;
             }
         }

@@ -1,9 +1,14 @@
 package common.xandayn.personalrecipes.io;
 
+import common.xandayn.personalrecipes.recipe.RecipeRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 /**
  * The FileHandler handles creation of folders and files, along with some
@@ -36,6 +41,7 @@ public class FileHandler {
     private static File _WORKING_DIRECTORY;
     private static File _PLUGINS_DIRECTORY;
     private static File _DATA_DIRECTORY;
+//    private static File _NBT_SAVE_FILE;
 
     public static void initialize(){
         _WORKING_DIRECTORY = new File(FMLCommonHandler.instance().getSide().isClient() ? Minecraft.getMinecraft().mcDataDir.getAbsoluteFile() : FMLCommonHandler.instance().getMinecraftServerInstance().getFile(""), "Personalized_Recipes");
@@ -43,6 +49,44 @@ public class FileHandler {
         _DATA_DIRECTORY = new File(_WORKING_DIRECTORY, "Data");
         createDirectory(_PLUGINS_DIRECTORY);
         createDirectory(_DATA_DIRECTORY);
+    }
+
+    public static void writeRecipesToNBT(String worldName){
+        File nbtSaveDir = new File(_DATA_DIRECTORY, worldName);
+        createDirectory(nbtSaveDir);
+        File nbtSaveFile = new File(nbtSaveDir, "recipes.dat");
+        try {
+            if(!nbtSaveFile.exists()) {
+                if(!nbtSaveFile.createNewFile()){
+                    throw new RuntimeException("Unable to create recipes.dat inside of directory: \"" + _DATA_DIRECTORY.getAbsolutePath() + "\" recipes cannot be to saved.");
+                }
+            }
+
+            NBTTagCompound tagCompound = new NBTTagCompound();
+            FileOutputStream stream = new FileOutputStream(nbtSaveFile);
+            RecipeRegistry.INSTANCE.writeAllRecipesToNBT(tagCompound);
+            CompressedStreamTools.writeCompressed(tagCompound, stream);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void readRecipesFromNBT(String worldName) {
+        File nbtSaveDir = new File(_DATA_DIRECTORY, worldName);
+        if(!nbtSaveDir.exists()) {
+            createDirectory(nbtSaveDir);
+            return;
+        }
+        File nbtSaveFile = new File(nbtSaveDir, "recipes.dat");
+        if(nbtSaveFile.exists()) {
+            try {
+                FileInputStream inputStream = new FileInputStream(nbtSaveFile);
+                NBTTagCompound readTag = CompressedStreamTools.readCompressed(inputStream);
+                RecipeRegistry.INSTANCE.readAllRecipesFromNBT(readTag);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static boolean createDirectory(File directory){
@@ -64,5 +108,4 @@ public class FileHandler {
     public static boolean isFileZipOrJar(File f){
         return f.getName().toLowerCase().endsWith(".zip") || f.getName().toLowerCase().endsWith(".jar");
     }
-
 }

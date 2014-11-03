@@ -2,6 +2,7 @@ package common.xandayn.personalrecipes.recipe;
 
 import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
+import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.ArrayList;
 
@@ -69,6 +70,12 @@ public abstract class CustomRecipeHandler<T> {
      * @return The number of recipes registered with the current Handler.
      */
     public abstract int getRecipeCount();
+
+    public abstract void writeToNBT(NBTTagCompound tagCompound);
+
+    public abstract void readFromNBT(NBTTagCompound tagCompound);
+
+    public abstract void clear();
 
     /**
      * @return True if non-custom recipes can be removed.

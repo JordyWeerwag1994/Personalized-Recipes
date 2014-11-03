@@ -6,6 +6,7 @@ import common.xandayn.personalrecipes.recipe.handler.FuelRecipeHandler;
 import common.xandayn.personalrecipes.recipe.handler.ShapedRecipeHandler;
 import common.xandayn.personalrecipes.recipe.handler.ShapelessRecipeHandler;
 import common.xandayn.personalrecipes.recipe.handler.SmeltingRecipeHandler;
+import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -124,6 +125,14 @@ public class RecipeRegistry {
         _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(handlerID)).deleteRecipe(recipeID);
     }
 
+    @SuppressWarnings("unchecked")
+    public void clearRecipes(){
+        Set<String> keys = _RECIPE_HANDLERS.keySet();
+        for(String key : keys){
+            _RECIPE_HANDLERS.get(key).clear();
+        }
+    }
+
     public int registeredRecipeHandlerCount(){
         return _RECIPE_HANDLERS.keySet().size();
     }
@@ -146,5 +155,20 @@ public class RecipeRegistry {
 
     public RecipeGUIComponent getRecipeGUIComponent(int aliasIntID) {
         return _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(aliasIntID)).getGUIComponent();
+    }
+
+    public void writeAllRecipesToNBT(NBTTagCompound writeTag){
+        Set<String> keys = _RECIPE_HANDLERS.keySet();
+        for(String key : keys){
+            if(_RECIPE_HANDLERS.get(key).getRecipeCount() > 0)
+                _RECIPE_HANDLERS.get(key).writeToNBT(writeTag);
+        }
+    }
+
+    public void readAllRecipesFromNBT(NBTTagCompound readTag) {
+        Set<String> keys = _RECIPE_HANDLERS.keySet();
+        for(String key : keys){
+            _RECIPE_HANDLERS.get(key).readFromNBT(readTag);
+        }
     }
 }

@@ -2,15 +2,17 @@ package common.xandayn.personalrecipes;
 
 import common.xandayn.personalrecipes.command.RecipeCommand;
 import common.xandayn.personalrecipes.common.GuiHandler;
+import common.xandayn.personalrecipes.event.EventHandler;
 import common.xandayn.personalrecipes.io.FileHandler;
 import common.xandayn.personalrecipes.plugin.loading.PluginLoader;
 import common.xandayn.personalrecipes.util.References;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import net.minecraftforge.common.MinecraftForge;
 
 /**
  * The class that defines the Personalized Recipes mod to Forge.
@@ -47,13 +49,18 @@ public class PersonalizedRecipes {
     @Instance(References.MOD_ID)
     public static PersonalizedRecipes INSTANCE;
 
-    @EventHandler
+    @Mod.EventHandler
     public void serverStart(FMLServerStartingEvent event){
         event.registerServerCommand(new RecipeCommand());
     }
 
-    @EventHandler
+    @Mod.EventHandler
+    public void serverStopping(FMLServerStoppingEvent event){
+    }
+
+    @Mod.EventHandler
     public void preInitialization(FMLPreInitializationEvent event){
+        MinecraftForge.EVENT_BUS.register(new EventHandler());
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         FileHandler.initialize();
         PluginLoader.loadPlugins();

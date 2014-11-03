@@ -3,9 +3,12 @@ package common.xandayn.personalrecipes.recipe.handler;
 import common.xandayn.personalrecipes.client.gui.recipe.ShapelessRecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.CustomRecipeHandler;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
+import common.xandayn.personalrecipes.util.Util;
 import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.ArrayList;
 
@@ -48,7 +51,7 @@ public class ShapelessRecipeHandler extends CustomRecipeHandler<ShapelessRecipes
 
     @Override
     public void registerRecipe(RecipeData recipeData) {
-        ShapelessRecipes recipe = new ShapelessRecipes(recipeData.itemOutputs.get(0),recipeData.itemInputs);
+        ShapelessRecipes recipe = new ShapelessRecipes(recipeData.itemOutputs.get(0), recipeData.itemInputs);
         addRecipe(recipe);
     }
 
@@ -75,5 +78,55 @@ public class ShapelessRecipeHandler extends CustomRecipeHandler<ShapelessRecipes
     @Override
     public int getRecipeCount() {
         return recipeList.size();
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound tagCompound) {
+        NBTTagCompound shapeless = new NBTTagCompound();
+        shapeless.setInteger("count",  recipeList.size());
+        for(int i = 0; i < recipeList.size(); i++){
+            ShapelessRecipes recipe = recipeList.get(i);
+            NBTTagCompound iterator = new NBTTagCompound();
+            NBTTagCompound inputs = new NBTTagCompound();
+            NBTTagCompound output = new NBTTagCompound();
+            iterator.setInteger("inputCount", recipe.getRecipeSize());
+            for(int j = 0; j < recipe.getRecipeSize(); j++){
+                NBTTagCompound input = new NBTTagCompound();
+                Util.writeItemStackToNBT(input, (ItemStack)recipe.recipeItems.get(j));
+                inputs.setTag(String.valueOf(j), input);
+            }
+            Util.writeItemStackToNBT(output, recipe.getRecipeOutput());
+            iterator.setTag("inputs", inputs);
+            iterator.setTag("output", output);
+            shapeless.setTag(String.valueOf(i), iterator);
+        }
+        tagCompound.setTag("Shapeless", shapeless);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tagCompound) {
+        if(tagCompound.hasKey("Shapeless")) {
+            NBTTagCompound shapeless = tagCompound.getCompoundTag("Shapeless");
+            int count = shapeless.getInteger("count");
+            for (int i = 0; i < count; i++) {
+                NBTTagCompound iterator = shapeless.getCompoundTag(String.valueOf(i));
+                NBTTagCompound inputTags = iterator.getCompoundTag("inputs");
+                NBTTagCompound outputTag = iterator.getCompoundTag("output");
+                int inputCount = iterator.getInteger("inputCount");
+                ArrayList<ItemStack> inputs = new ArrayList<>(inputCount);
+                for (int j = 0; j < inputCount; j++) {
+                    inputs.add(Util.readItemStackFromNBT(inputTags.getCompoundTag(String.valueOf(j))));
+                }
+                ItemStack output = Util.readItemStackFromNBT(outputTag);
+                addRecipe(new ShapelessRecipes(output, inputs));
+            }
+        }
+    }
+
+    @Override
+    public void clear() {
+        for(int i = 0; i < recipeList.size(); i++){
+            deleteRecipe(i);
+        }
     }
 }

@@ -121,7 +121,6 @@ public class PluginLoader {
                         if (fileName.toLowerCase().endsWith(".class")) {
                             urls.add(new URL(baseURL.concat(fileName)));
                             classNames.add(fileNameToClassName(fileName));
-                            System.out.println("Class Name: " + fileNameToClassName(fileName));
                         }
                     }
                 }
