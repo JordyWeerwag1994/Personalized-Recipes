@@ -2,6 +2,8 @@ package common.xandayn.personalrecipes;
 
 import common.xandayn.personalrecipes.command.RecipeCommand;
 import common.xandayn.personalrecipes.common.GuiHandler;
+import common.xandayn.personalrecipes.io.FileHandler;
+import common.xandayn.personalrecipes.plugin.loading.PluginLoader;
 import common.xandayn.personalrecipes.util.References;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -53,6 +55,8 @@ public class PersonalizedRecipes {
     @EventHandler
     public void preInitialization(FMLPreInitializationEvent event){
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
+        FileHandler.initialize();
+        PluginLoader.loadPlugins();
     }
 
 }

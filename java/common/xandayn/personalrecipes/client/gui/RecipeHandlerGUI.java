@@ -131,7 +131,7 @@ public class RecipeHandlerGUI extends GuiContainer {
 
     private void startTypeSelectedState(){
         buttonList.clear();
-        component = RecipeRegistry.getRecipeGUIComponent(RecipeRegistry.getAliasIntID(slider.getSelected()));
+        component = RecipeRegistry.INSTANCE.getRecipeGUIComponent(RecipeRegistry.INSTANCE.getAliasIntID(slider.getSelected()));
         _curState = GUIState.TYPE_SELECTED;
         component.initGUI(this);
     }
@@ -140,7 +140,7 @@ public class RecipeHandlerGUI extends GuiContainer {
         buttonList.clear();
         _curState = GUIState.JUST_OPENED;
         component = null;
-        slider = new GUISlidingList(guiLeft + 20, guiTop + 26, RecipeRegistry.getRegisteredAliases().toArray(new String[RecipeRegistry.registeredRecipeHandlerCount()]));
+        slider = new GUISlidingList(guiLeft + 20, guiTop + 26, RecipeRegistry.INSTANCE.getRegisteredAliases().toArray(new String[RecipeRegistry.INSTANCE.registeredRecipeHandlerCount()]));
         registerGuiButton(selectButton = new GuiButton(0, guiLeft + 110, guiTop + 37, 39, 20, "Select"));
         registerGuiButton(exitButton = new GuiButton(1, guiLeft + 110, guiTop + 71, 39, 20, "Exit"));
         exitButton.enabled = false;

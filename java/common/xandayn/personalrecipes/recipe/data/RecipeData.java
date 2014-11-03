@@ -61,7 +61,7 @@ public class RecipeData {
     /**
      * A function that causes this recipe to register itself.
      */
-    public final void register() { RecipeRegistry.registerRecipe(RecipeRegistry.getAliasIntID(recipeType), this); }
+    public final void register() { RecipeRegistry.INSTANCE.registerRecipe(RecipeRegistry.INSTANCE.getAliasIntID(recipeType), this); }
 
     /**
      * @return The alias associated with a CustomRecipeHandler that can parse this recipe.
@@ -72,4 +72,8 @@ public class RecipeData {
         return recipeType;
     }
 
+    @Override
+    public String toString() {
+        return "[".concat(recipeType).concat("]");
+    }
 }

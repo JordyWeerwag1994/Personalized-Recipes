@@ -40,10 +40,12 @@ import java.util.Set;
  */
 public class RecipeRegistry {
 
+    public static final RecipeRegistry INSTANCE = new RecipeRegistry();
+
     /**
      * The backing HashMap for recipe registration.
      */
-    private static HashMap<String, CustomRecipeHandler> _RECIPE_HANDLERS;
+    private HashMap<String, CustomRecipeHandler> _RECIPE_HANDLERS;
 
     /**
      * A HashMap containing a String value, with an Integer key, where key = value.hashCode(),
@@ -52,9 +54,9 @@ public class RecipeRegistry {
      * Potential Bug: If the hash of one string is equal to another this will break, but that
      * is very unlikely.
      */
-    private static HashMap<Integer, String> _HANDLER_HASHES;
+    private HashMap<Integer, String> _HANDLER_HASHES;
 
-    static {
+    private RecipeRegistry(){
         _RECIPE_HANDLERS = new HashMap<>();
         _HANDLER_HASHES = new HashMap<>();
 
@@ -67,7 +69,7 @@ public class RecipeRegistry {
     /**
      * A function used to register CustomRecipeHandlers for use within the mod. CustomRecipeHandlers may be registered
      * multiple times under different aliases, however, aliases must be unique, and never repeated. Registration should occur during
-     * FMLPreInitialization.
+     * FMLPreInitialization if integrated with a mod (not using a plugin).
      *
      * @param recipeHandler A class extending CustomRecipeHandler, used when registering a recipe for the alias supplied.
      *
@@ -75,9 +77,8 @@ public class RecipeRegistry {
      *
      * @see CustomRecipeHandler
      * @see CustomRecipeHandler#getID()
-     * @see cpw.mods.fml.common.event.FMLPreInitializationEvent
      */
-    public static void registerRecipeHandler(CustomRecipeHandler recipeHandler) {
+    public void registerRecipeHandler(CustomRecipeHandler recipeHandler) {
         if(!_RECIPE_HANDLERS.containsKey(recipeHandler.getID())){
             _RECIPE_HANDLERS.put(recipeHandler.getID(), recipeHandler);
             _HANDLER_HASHES.put(recipeHandler.getID().hashCode(), recipeHandler.getID());
@@ -93,7 +94,7 @@ public class RecipeRegistry {
      *
      * @see String#hashCode()
      */
-    public static int getAliasIntID(String alias){
+    public int getAliasIntID(String alias){
         return alias.hashCode();
     }
 
@@ -106,7 +107,7 @@ public class RecipeRegistry {
      * @see common.xandayn.personalrecipes.recipe.RecipeRegistry#getAliasIntID(String)
      * @see common.xandayn.personalrecipes.recipe.data.RecipeData
      */
-    public static void registerRecipe(int handlerID, RecipeData data){
+    public void registerRecipe(int handlerID, RecipeData data){
         _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(handlerID)).registerRecipe(data);
     }
 
@@ -119,11 +120,11 @@ public class RecipeRegistry {
      * @see common.xandayn.personalrecipes.recipe.RecipeRegistry#getAliasIntID(String)
      * @see common.xandayn.personalrecipes.recipe.CustomRecipeHandler
      */
-    public static void removeRecipe(int handlerID, int recipeID){
+    public void removeRecipe(int handlerID, int recipeID){
         _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(handlerID)).deleteRecipe(recipeID);
     }
 
-    public static int registeredRecipeHandlerCount(){
+    public int registeredRecipeHandlerCount(){
         return _RECIPE_HANDLERS.keySet().size();
     }
 
@@ -132,18 +133,18 @@ public class RecipeRegistry {
      * @param alias The alias to check against.
      * @return True if alias has already been registered, false otherwise.
      */
-    public static boolean isAliasUnique(String alias){
+    public boolean isAliasUnique(String alias){
         for(String s : _RECIPE_HANDLERS.keySet()){
             System.out.println(s);
         }
         return !_RECIPE_HANDLERS.containsKey(alias);
     }
 
-    public static Set<String> getRegisteredAliases(){
+    public Set<String> getRegisteredAliases(){
         return _RECIPE_HANDLERS.keySet();
     }
 
-    public static RecipeGUIComponent getRecipeGUIComponent(int aliasIntID) {
+    public RecipeGUIComponent getRecipeGUIComponent(int aliasIntID) {
         return _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(aliasIntID)).getGUIComponent();
     }
 }
