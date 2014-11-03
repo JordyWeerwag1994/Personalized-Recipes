@@ -75,12 +75,12 @@ public class Rendering {
         GL11.glPopMatrix();
     }
 
-    public static void drawTexturedRectangleWithUVStretching(int xPos, int yPos, int u, int v, int width, int height){
+    public static void drawTexturedRectangleWithUVStretching(int xPos, int yPos, int width, int height, int u, int v, int uvWidth, int uvHeight){
         GL11.glPushMatrix();
             _TESSELATOR.startDrawing(GL11.GL_QUADS);
-            _TESSELATOR.addVertexWithUV(xPos, yPos + height, 0, u * _UV_MULT, v * _UV_MULT);
-            _TESSELATOR.addVertexWithUV(xPos + width, yPos + height, 0, u * _UV_MULT, v * _UV_MULT);
-            _TESSELATOR.addVertexWithUV(xPos + width, yPos, 0, u * _UV_MULT, v * _UV_MULT);
+            _TESSELATOR.addVertexWithUV(xPos, yPos + height, 0, u * _UV_MULT, (v + uvHeight) * _UV_MULT);
+            _TESSELATOR.addVertexWithUV(xPos + width, yPos + height, 0, (u + uvWidth) * _UV_MULT, (v + uvHeight) * _UV_MULT);
+            _TESSELATOR.addVertexWithUV(xPos + width, yPos, 0, (u + uvWidth) * _UV_MULT, v * _UV_MULT);
             _TESSELATOR.addVertexWithUV(xPos, yPos, 0, u * _UV_MULT, v * _UV_MULT);
             _TESSELATOR.draw();
         GL11.glPopMatrix();
