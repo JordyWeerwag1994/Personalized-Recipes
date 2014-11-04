@@ -48,8 +48,8 @@ public class SmeltingRecipeGUIComponent extends RecipeGUIComponent {
     }
 
     @Override
-    public void initGUI(RecipeHandlerGUI gui) {
-        super.initGUI(gui);
+    public void initGUI(RecipeHandlerGUI gui, boolean remove) {
+        super.initGUI(gui, remove);
         buttonList.add(save = new GuiButton(0, guiLeft + 72, guiTop + 11, 42, 18, "Save"));
         buttonList.add(new GuiButton(1, guiLeft + 72, guiTop + 55, 42, 18, "Back"));
         components.add(input = new GUIItemListDialogSlot(guiLeft + 25, guiTop + 16, guiLeft, guiTop, 1));

@@ -51,8 +51,9 @@ public class GUITextField extends GUIComponent {
 
     private static final String CARET = "|";
     private static final int _TEXT_FIELD_HEIGHT = 14;
-    private static final int _TEXT_FIELD_TEXTURE_SIZE = 14;
-    private static final int _TEXT_FIELD_TEXTURE_X = 44;
+    private static final int _TEXT_FIELD_TEXTURE_WIDTH = 44;
+    private static final int _TEXT_FIELD_TEXTURE_HEIGHT = 14;
+    private static final int _TEXT_FIELD_TEXTURE_X = 0;
     private static final int _TEXT_FIELD_TEXTURE_Y = 85;
     private static final int _STRING_BUFFER = 3;
     private boolean active;
@@ -105,7 +106,7 @@ public class GUITextField extends GUIComponent {
     @Override
     public void renderBackground(int mouseX, int mouseY) {
         Rendering.bindTexture(References.GUI_COMPONENTS);
-        Rendering.drawTexturedRectangleWithUVStretching(x, y, width, _TEXT_FIELD_HEIGHT, _TEXT_FIELD_TEXTURE_X, _TEXT_FIELD_TEXTURE_Y, _TEXT_FIELD_TEXTURE_SIZE, _TEXT_FIELD_TEXTURE_SIZE);
+        Rendering.drawTexturedRectangleWithUVStretching(x, y, width, _TEXT_FIELD_HEIGHT, _TEXT_FIELD_TEXTURE_X, _TEXT_FIELD_TEXTURE_Y, _TEXT_FIELD_TEXTURE_WIDTH, _TEXT_FIELD_TEXTURE_HEIGHT);
     }
 
     @Override

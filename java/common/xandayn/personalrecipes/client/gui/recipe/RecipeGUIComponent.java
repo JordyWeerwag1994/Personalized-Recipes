@@ -37,6 +37,7 @@ public abstract class RecipeGUIComponent {
     protected ResourceLocation texture;
     protected RecipeHandlerGUI gui;
     protected ArrayList<GuiButton> buttonList;
+    protected boolean remove;
 
     protected ArrayList<GUIComponent> components;
 
@@ -45,9 +46,10 @@ public abstract class RecipeGUIComponent {
         this.components = new ArrayList<>();
     }
 
-    public void initGUI(RecipeHandlerGUI gui) {
+    public void initGUI(RecipeHandlerGUI gui, boolean remove) {
         buttonList.clear();
         components.clear();
+        this.remove = remove;
         this.gui = gui;
         this.guiLeft = (gui.width - this.xSize) / 2;
         this.guiTop = (gui.height - this.ySize) / 2;

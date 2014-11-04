@@ -46,8 +46,8 @@ public class ShapelessRecipeGUIComponent extends RecipeGUIComponent{
     }
 
     @Override
-    public void initGUI(RecipeHandlerGUI gui) {
-        super.initGUI(gui);
+    public void initGUI(RecipeHandlerGUI gui, boolean remove) {
+        super.initGUI(gui, remove);
         buttonList.add(save = new GuiButton(0, guiLeft + 87, guiTop + 16, 26, 16, "Save"));
         buttonList.add(new GuiButton(1, guiLeft + 87, guiTop + 54, 26, 16, "Back"));
         save.enabled = false;

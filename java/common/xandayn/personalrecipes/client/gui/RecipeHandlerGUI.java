@@ -1,5 +1,6 @@
 package common.xandayn.personalrecipes.client.gui;
 
+import common.xandayn.personalrecipes.client.gui.component.GUICheckBox;
 import common.xandayn.personalrecipes.client.gui.component.GUISlidingList;
 import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.RecipeRegistry;
@@ -59,6 +60,7 @@ public class RecipeHandlerGUI extends GuiContainer {
     private RecipeGUIComponent component = null;
     private EntityPlayer player;
     private GUISlidingList slider;
+    private GUICheckBox removeMode;
 
     //JUST_OPENED state variables
     private GuiButton selectButton;
@@ -109,6 +111,7 @@ public class RecipeHandlerGUI extends GuiContainer {
         switch (_curState){
             case JUST_OPENED:
                 slider.mousePressed(mouseX, mouseY, mouseButton);
+                removeMode.mousePressed(mouseX, mouseY, mouseButton);
                 break;
             case TYPE_SELECTED:
                 component.mousePressed(mouseX, mouseY, mouseButton);
@@ -133,7 +136,7 @@ public class RecipeHandlerGUI extends GuiContainer {
         buttonList.clear();
         component = RecipeRegistry.INSTANCE.getRecipeGUIComponent(RecipeRegistry.INSTANCE.getAliasIntID(slider.getSelected()));
         _curState = GUIState.TYPE_SELECTED;
-        component.initGUI(this);
+        component.initGUI(this, !removeMode.isChecked());
     }
 
     private void initialize() {
@@ -141,6 +144,7 @@ public class RecipeHandlerGUI extends GuiContainer {
         _curState = GUIState.JUST_OPENED;
         component = null;
         slider = new GUISlidingList(guiLeft + 20, guiTop + 26, RecipeRegistry.INSTANCE.getRegisteredAliases().toArray(new String[RecipeRegistry.INSTANCE.registeredRecipeHandlerCount()]));
+        removeMode = new GUICheckBox(guiLeft + 110, guiTop + 24, 10, true);
         registerGuiButton(selectButton = new GuiButton(0, guiLeft + 110, guiTop + 37, 39, 20, "Select"));
         registerGuiButton(exitButton = new GuiButton(1, guiLeft + 110, guiTop + 71, 39, 20, "Exit"));
         exitButton.enabled = false;
@@ -199,6 +203,9 @@ public class RecipeHandlerGUI extends GuiContainer {
                 drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
                 slider.update(mouseX, mouseY);
                 slider.renderBackground(mouseX, mouseY);
+
+                removeMode.update(mouseX, mouseY);
+                removeMode.renderBackground(mouseX, mouseY);
                 break;
             case TYPE_SELECTED:
                 component.update(mouseX, mouseY);
@@ -217,9 +224,12 @@ public class RecipeHandlerGUI extends GuiContainer {
                     Rendering.drawString("Selected: " + slider.getSelected(), 32, 108, 0xFFDDDDDD);
                 }
 
+                Rendering.drawString(!removeMode.isChecked() ? "Remove" : "Add", 110, 60, 0xFFDDDDDD);
+
                 GL11.glPushMatrix();
                 GL11.glTranslatef(-guiLeft, -guiTop, 0);
                 slider.renderForeground(mouseX, mouseY);
+                removeMode.renderForeground(mouseX, mouseY);
                 GL11.glPopMatrix();
                 break;
             case TYPE_SELECTED:

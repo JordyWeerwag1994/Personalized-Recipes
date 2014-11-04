@@ -51,8 +51,8 @@ public class ShapedRecipeGUIComponent extends RecipeGUIComponent {
     }
 
     @Override
-    public void initGUI(RecipeHandlerGUI gui) {
-        super.initGUI(gui);
+    public void initGUI(RecipeHandlerGUI gui, boolean remove) {
+        super.initGUI(gui, remove);
         buttonList.add(save = new GuiButton(0, guiLeft + 87, guiTop + 16, 26, 16, "Save"));
         save.enabled = false;
         buttonList.add(xMinus = new GuiButton(1, guiLeft + 37, guiTop + 5, 8, 8, "-"));

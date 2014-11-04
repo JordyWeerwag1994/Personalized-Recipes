@@ -50,8 +50,8 @@ public class FuelRecipeGUIComponent extends RecipeGUIComponent{
     }
 
     @Override
-    public void initGUI(RecipeHandlerGUI gui) {
-        super.initGUI(gui);
+    public void initGUI(RecipeHandlerGUI gui, boolean remove) {
+        super.initGUI(gui, remove);
         components.add(textField = new GUITextField(guiLeft + 11, guiTop + 49, 50, 6, null));
         components.add(slot = new GUIItemListDialogSlot(guiLeft + 11, guiTop + 11, guiLeft, guiTop, 1));
         buttonList.add(save = new GuiButton(0, guiLeft + 43, guiTop + 10, 32, 18, "Save"));
