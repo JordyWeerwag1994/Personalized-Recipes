@@ -56,7 +56,7 @@ public class GUITextField extends GUIComponent {
     private static final int _TEXT_FIELD_TEXTURE_X = 0;
     private static final int _TEXT_FIELD_TEXTURE_Y = 85;
     private static final int _STRING_BUFFER = 3;
-    private boolean active;
+    private boolean active, enabled = true;
     private Rectangle bounds;
     private StringBuilder contents;
     private boolean wasCleared = false;
@@ -120,24 +120,26 @@ public class GUITextField extends GUIComponent {
 
     @Override
     public void mousePressed(int mouseX, int mouseY, int mouseButton) {
-        if(bounds.contains(mouseX, mouseY)){
-            switch(mouseButton){
-                case 0:
-                    active = true;
-                    break;
-                case 1:
-                    wasCleared = true;
-                    contents = new StringBuilder();
-                    break;
+        if(enabled) {
+            if (bounds.contains(mouseX, mouseY)) {
+                switch (mouseButton) {
+                    case 0:
+                        active = true;
+                        break;
+                    case 1:
+                        wasCleared = true;
+                        contents = new StringBuilder();
+                        break;
+                }
+            } else {
+                active = false;
             }
-        } else {
-            active = false;
         }
     }
 
     @Override
     public boolean keyTyped(char typed, int keyCode){
-        if(active) {
+        if(enabled && active) {
             if (keyCode == Keyboard.KEY_BACK && contents.length() > 0) {
                 contents.deleteCharAt(contents.length() - 1);
             } else if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_ESCAPE) {
@@ -161,5 +163,13 @@ public class GUITextField extends GUIComponent {
 
     public String getText() {
         return contents.length() == 0 ? null : contents.toString();
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -1,6 +1,7 @@
 package common.xandayn.personalrecipes.recipe.handler;
 
-import common.xandayn.personalrecipes.client.gui.recipe.FuelRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.add.FuelRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.remove.FuelRecipeRemoveGUIComponent;
 import common.xandayn.personalrecipes.recipe.CustomRecipeHandler;
 import common.xandayn.personalrecipes.recipe.data.FuelRecipeData;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
@@ -44,6 +45,7 @@ public class FuelRecipeHandler extends CustomRecipeHandler<FuelRecipeData> imple
     public FuelRecipeHandler() {
         super(new FuelRecipeGUIComponent());
         GameRegistry.registerFuelHandler(this);
+        removeGuiComponent = new FuelRecipeRemoveGUIComponent(this);
     }
 
     @Override

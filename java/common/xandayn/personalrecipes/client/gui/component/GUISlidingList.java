@@ -46,8 +46,8 @@ public class GUISlidingList extends GUIComponent {
 
     protected static final int _GUI_SLIDER_SLIDER_TEXTURE_WIDTH = 10;
     protected static final int _GUI_SLIDER_SLIDER_TEXTURE_HEIGHT = 9;
-    protected static final int _GUI_SLIDER_SLIDER_TEXTURE_X = 74;
-    protected static final int _GUI_SLIDER_SLIDER_TEXTURE_Y = 0;
+    protected static final int _GUI_SLIDER_SLIDER_TEXTURE_X = 58;
+    protected static final int _GUI_SLIDER_SLIDER_TEXTURE_Y = 76;
 
     protected static final int _GUI_SLIDER_SELECTION_TEXTURE_WIDTH = 58;
     protected static final int _GUI_SLIDER_SELECTION_TEXTURE_HEIGHT = 9;

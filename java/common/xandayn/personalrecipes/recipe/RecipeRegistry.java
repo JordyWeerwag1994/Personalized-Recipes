@@ -140,12 +140,9 @@ public class RecipeRegistry {
     /**
      * A method that checks to see if a specified alias has been registered.
      * @param alias The alias to check against.
-     * @return True if alias has already been registered, false otherwise.
+     * @return False if alias has already been registered, true otherwise.
      */
     public boolean isAliasUnique(String alias){
-        for(String s : _RECIPE_HANDLERS.keySet()){
-            System.out.println(s);
-        }
         return !_RECIPE_HANDLERS.containsKey(alias);
     }
 
@@ -153,8 +150,8 @@ public class RecipeRegistry {
         return _RECIPE_HANDLERS.keySet();
     }
 
-    public RecipeGUIComponent getRecipeGUIComponent(int aliasIntID) {
-        return _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(aliasIntID)).getGUIComponent();
+    public RecipeGUIComponent getRecipeAddGUIComponent(int aliasIntID) {
+        return _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(aliasIntID)).getAddGUIComponent();
     }
 
     public void writeAllRecipesToNBT(NBTTagCompound writeTag){
@@ -170,5 +167,17 @@ public class RecipeRegistry {
         for(String key : keys){
             _RECIPE_HANDLERS.get(key).readFromNBT(readTag);
         }
+    }
+
+    public String getAliasFromID(int id) {
+        return _HANDLER_HASHES.containsKey(id) ? _HANDLER_HASHES.get(id) : null;
+    }
+
+    public RecipeGUIComponent getRecipeRemoveGUIComponent(int aliasIntID) {
+        return _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(aliasIntID)).getRemoveGUIComponent();
+    }
+
+    public int getRecipeCount(int id) {
+        return _HANDLER_HASHES.containsKey(id) ? _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(id)).getRecipeCount() : 0;
     }
 }

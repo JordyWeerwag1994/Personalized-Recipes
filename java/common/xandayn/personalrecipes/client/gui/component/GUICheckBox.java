@@ -21,6 +21,10 @@ public class GUICheckBox extends GUIComponent{
         this(x, y, 5, false);
     }
 
+    public void setChecked(boolean value) {
+        checked = value;
+    }
+
     public boolean isChecked(){
         return checked;
     }

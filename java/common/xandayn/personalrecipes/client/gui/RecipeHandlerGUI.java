@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
@@ -39,6 +40,10 @@ import org.lwjgl.opengl.GL11;
  */
 public class RecipeHandlerGUI extends GuiContainer {
 
+    public int getGuiTop() {
+        return guiTop;
+    }
+
     /**
      * An enumeration to define what our current state is,
      * if we've just opened the inventory and haven't selected
@@ -66,6 +71,9 @@ public class RecipeHandlerGUI extends GuiContainer {
     private GuiButton selectButton;
     private GuiButton exitButton;
 
+    private boolean startRemove;
+    private String startID;
+
     /**
      * A basic implementation of the Container class, the only reason this
      * is here is because GuiContainer requires it, it is unused other than
@@ -78,13 +86,15 @@ public class RecipeHandlerGUI extends GuiContainer {
         }
     }
 
-    public RecipeHandlerGUI(EntityPlayer player) {
+    public RecipeHandlerGUI(EntityPlayer player, String id, boolean remove) {
         super(new RH_Container());
-        _curState = GUIState.JUST_OPENED;
+        this.player = player;
         background = new ResourceLocation(References.MOD_ID.toLowerCase(), "textures/gui/handler_selector.png");
+        _curState = GUIState.JUST_OPENED;
         xSize = 172;
         ySize = 128;
-        this.player = player;
+        startID = id;
+        startRemove = remove;
     }
 
     @Override
@@ -102,7 +112,11 @@ public class RecipeHandlerGUI extends GuiContainer {
     @Override
     public void initGui() {
         super.initGui();
-        initialize();
+        if(startID == null) {
+            initialize();
+        } else {
+            startTypeSelectedState(startID, startRemove);
+        }
     }
 
     @Override
@@ -132,11 +146,19 @@ public class RecipeHandlerGUI extends GuiContainer {
         }
     }
 
-    private void startTypeSelectedState(){
+    public void render_tool_tip(ItemStack item, int x, int y) {
+        this.renderToolTip(item, x, y);
+    }
+
+    private void startTypeSelectedState(String selected, boolean remove){
         buttonList.clear();
-        component = RecipeRegistry.INSTANCE.getRecipeGUIComponent(RecipeRegistry.INSTANCE.getAliasIntID(slider.getSelected()));
+        if(remove) {
+            component = RecipeRegistry.INSTANCE.getRecipeRemoveGUIComponent(RecipeRegistry.INSTANCE.getAliasIntID(selected));
+        } else {
+            component = RecipeRegistry.INSTANCE.getRecipeAddGUIComponent(RecipeRegistry.INSTANCE.getAliasIntID(selected));
+        }
         _curState = GUIState.TYPE_SELECTED;
-        component.initGUI(this, !removeMode.isChecked());
+        component.initGUI(this, player);
     }
 
     private void initialize() {
@@ -145,6 +167,7 @@ public class RecipeHandlerGUI extends GuiContainer {
         component = null;
         slider = new GUISlidingList(guiLeft + 20, guiTop + 26, RecipeRegistry.INSTANCE.getRegisteredAliases().toArray(new String[RecipeRegistry.INSTANCE.registeredRecipeHandlerCount()]));
         removeMode = new GUICheckBox(guiLeft + 110, guiTop + 24, 10, true);
+        removeMode.setChecked(true);
         registerGuiButton(selectButton = new GuiButton(0, guiLeft + 110, guiTop + 37, 39, 20, "Select"));
         registerGuiButton(exitButton = new GuiButton(1, guiLeft + 110, guiTop + 71, 39, 20, "Exit"));
         exitButton.enabled = false;
@@ -170,7 +193,7 @@ public class RecipeHandlerGUI extends GuiContainer {
                 switch (button.id){
                     case 0:
                         if(slider.getSelected() != null){
-                            startTypeSelectedState();
+                            startTypeSelectedState(slider.getSelected(), !removeMode.isChecked());
                         }
                         break;
                     case 1:
@@ -189,8 +212,17 @@ public class RecipeHandlerGUI extends GuiContainer {
         super.updateScreen();
         switch (_curState){
             case JUST_OPENED:
-                selectButton.enabled = slider.getSelected() != null;
-                if(exitButton != null && !exitButton.enabled) exitButton.enabled = true;
+                if (exitButton != null && !exitButton.enabled) exitButton.enabled = true;
+                if (removeMode.isChecked()) {
+                    selectButton.enabled = slider.getSelected() != null;
+                } else {
+                    if(slider.getSelected() != null) {
+                        int id = RecipeRegistry.INSTANCE.getAliasIntID(slider.getSelected());
+                        selectButton.enabled = RecipeRegistry.INSTANCE.getRecipeRemoveGUIComponent(id) != null && RecipeRegistry.INSTANCE.getRecipeCount(id) > 0;
+                    } else {
+                        selectButton.enabled = false;
+                    }
+                }
                 break;
         }
     }
@@ -224,8 +256,7 @@ public class RecipeHandlerGUI extends GuiContainer {
                     Rendering.drawString("Selected: " + slider.getSelected(), 32, 108, 0xFFDDDDDD);
                 }
 
-                Rendering.drawString(!removeMode.isChecked() ? "Remove" : "Add", 110, 60, 0xFFDDDDDD);
-
+                Rendering.drawString(!removeMode.isChecked() ? "Remove" : "Add", 115, 24, 0xFFDDDDDD);
                 GL11.glPushMatrix();
                 GL11.glTranslatef(-guiLeft, -guiTop, 0);
                 slider.renderForeground(mouseX, mouseY);

@@ -1,11 +1,8 @@
 package common.xandayn.personalrecipes.common;
 
-import common.xandayn.personalrecipes.client.gui.RecipeHandlerGUI;
-import common.xandayn.personalrecipes.recipe.RecipeRegistry;
-import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.relauncher.Side;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.World;
+import common.xandayn.personalrecipes.util.References;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 /**
  * @license
@@ -31,16 +28,10 @@ import net.minecraft.world.World;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class GuiHandler implements IGuiHandler {
+public class NetworkHandler {
+    public static SimpleNetworkWrapper NETWORK;
 
-    @Override
-    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        return new RecipeHandlerGUI.RH_Container();
-    }
-
-
-    @Override
-    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        return new RecipeHandlerGUI(player, RecipeRegistry.INSTANCE.getAliasFromID(ID), x != 0);
+    public static void iniitialize() {
+        NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(References.MOD_CHANNEL_ID);
     }
 }

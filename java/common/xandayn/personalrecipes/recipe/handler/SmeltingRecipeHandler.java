@@ -1,6 +1,7 @@
 package common.xandayn.personalrecipes.recipe.handler;
 
-import common.xandayn.personalrecipes.client.gui.recipe.SmeltingRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.add.SmeltingRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.remove.SmeltingRecipeRemoveGUIComponent;
 import common.xandayn.personalrecipes.recipe.CustomRecipeHandler;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
 import common.xandayn.personalrecipes.recipe.data.SmeltingRecipeData;
@@ -8,6 +9,7 @@ import common.xandayn.personalrecipes.util.Util;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
+import org.lwjgl.Sys;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -41,23 +43,10 @@ import java.util.HashMap;
 public class SmeltingRecipeHandler extends CustomRecipeHandler<SmeltingRecipeData> {
 
     private ArrayList<SmeltingRecipeData> data = new ArrayList<>();
-    private HashMap<ItemStack, Float> experienceList;
 
     public SmeltingRecipeHandler() {
         super(new SmeltingRecipeGUIComponent());
-        getExperienceList();
-    }
-
-    @SuppressWarnings("unchecked")
-    private void getExperienceList(){
-        try {
-            Field eList = FurnaceRecipes.class.getDeclaredField("experienceList");
-            eList.setAccessible(true);
-            experienceList = (HashMap<ItemStack, Float>)eList.get(FurnaceRecipes.smelting());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        removeGuiComponent = new SmeltingRecipeRemoveGUIComponent(this);
     }
 
     @Override
@@ -67,20 +56,21 @@ public class SmeltingRecipeHandler extends CustomRecipeHandler<SmeltingRecipeDat
 
     @Override
     public void registerRecipe(RecipeData recipeData) {
-        FurnaceRecipes.smelting().func_151394_a(recipeData.itemInputs.get(0), recipeData.itemOutputs.get(0), ((SmeltingRecipeData)recipeData).smeltingEXP);
-        data.add((SmeltingRecipeData)recipeData);
+        if(data.add((SmeltingRecipeData)recipeData)) {
+            FurnaceRecipes.smelting().func_151394_a(recipeData.itemInputs.get(0), recipeData.itemOutputs.get(0), ((SmeltingRecipeData) recipeData).smeltingEXP);
+        }
     }
 
     @Override
     public void deleteRecipe(int position) {
         SmeltingRecipeData removed = data.remove(position);
         ItemStack removedItem = (ItemStack)FurnaceRecipes.smelting().getSmeltingList().remove(removed.itemInputs.get(0));
-        experienceList.remove(removedItem);
+        FurnaceRecipes.smelting().experienceList.remove(removedItem);
     }
 
     @Override
     public ArrayList<SmeltingRecipeData> getRecipes() {
-        return null;
+        return data;
     }
 
     @Override
@@ -130,8 +120,10 @@ public class SmeltingRecipeHandler extends CustomRecipeHandler<SmeltingRecipeDat
 
     @Override
     public void clear() {
-        for(int i = 0; i < data.size(); i++){
-            deleteRecipe(i);
+        int count = data.size();
+        for(int i = 0; i < count; i++){
+            deleteRecipe(0);
         }
+        data.clear();
     }
 }

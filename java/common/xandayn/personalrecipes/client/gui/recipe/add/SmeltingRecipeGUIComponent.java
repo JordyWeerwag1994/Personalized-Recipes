@@ -1,11 +1,17 @@
-package common.xandayn.personalrecipes.client.gui.recipe;
+package common.xandayn.personalrecipes.client.gui.recipe.add;
 
 import common.xandayn.personalrecipes.client.gui.RecipeHandlerGUI;
 import common.xandayn.personalrecipes.client.gui.component.GUIComponent;
+import common.xandayn.personalrecipes.client.gui.component.GUIInventoryComponent;
 import common.xandayn.personalrecipes.client.gui.component.GUIItemListDialogSlot;
-import common.xandayn.personalrecipes.recipe.data.RecipeData;
+import common.xandayn.personalrecipes.client.gui.component.GUITextField;
+import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
+import common.xandayn.personalrecipes.recipe.data.SmeltingRecipeData;
 import common.xandayn.personalrecipes.util.References;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -34,31 +40,31 @@ import java.util.ArrayList;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class ShapelessRecipeGUIComponent extends RecipeGUIComponent{
+public class SmeltingRecipeGUIComponent extends RecipeGUIComponent {
 
-    private GUIItemListDialogSlot dialogSlot, outputSlot;
     private GuiButton save;
+    private GUIItemListDialogSlot dialogSlot, input, output;
+    private GUITextField expCount;
+    private GUIInventoryComponent inventoryComponent;
 
-    public ShapelessRecipeGUIComponent(){
-        texture = new ResourceLocation(References.MOD_ID.toLowerCase(), "textures/gui/component/recipe_component.png");
+    public SmeltingRecipeGUIComponent(){
+        texture = new ResourceLocation(References.MOD_ID.toLowerCase(), "textures/gui/component/smelting_recipe_component.png");
         this.xSize = 128;
         this.ySize = 86;
     }
 
     @Override
-    public void initGUI(RecipeHandlerGUI gui, boolean remove) {
-        super.initGUI(gui, remove);
-        buttonList.add(save = new GuiButton(0, guiLeft + 87, guiTop + 16, 26, 16, "Save"));
-        buttonList.add(new GuiButton(1, guiLeft + 87, guiTop + 54, 26, 16, "Back"));
+    public void initGUI(RecipeHandlerGUI gui, EntityPlayer player) {
+        super.initGUI(gui, player);
+        buttonList.add(save = new GuiButton(0, guiLeft + 72, guiTop + 11, 42, 18, "Save"));
+        buttonList.add(new GuiButton(1, guiLeft + 72, guiTop + 55, 42, 18, "Back"));
+        components.add(inventoryComponent = new GUIInventoryComponent(guiLeft - ((GUIInventoryComponent._TEXTURE_WIDTH / 2) - (xSize / 2)), guiTop + ySize, player, gui));
+        components.add(input = new GUIItemListDialogSlot(guiLeft + 25, guiTop + 16, guiLeft, guiTop, 1, gui));
+        components.add(output = new GUIItemListDialogSlot(guiLeft + 85, guiTop + 34, guiLeft, guiTop, 64, gui));
+        components.add(expCount = new GUITextField(guiLeft + 50, guiTop + 36, 24, 3, null));
+        expCount.setAllowed(GUITextField.NUMERIC_ONLY);
         save.enabled = false;
-        for(int i = 0; i < 9; i++){
-            int x = i % 3;
-            int y = i / 3;
-            int bufferX = x * 2;
-            int bufferY = y * 2;
-            components.add(new GUIItemListDialogSlot(20 + (16 * x) + bufferX + guiLeft, 17 + (16 * y) + bufferY + guiTop, guiLeft, guiTop, 1));
-        }
-        components.add(outputSlot = new GUIItemListDialogSlot(92 + guiLeft, 35 + guiTop, guiLeft, guiTop, 64));
+
     }
 
     @Override
@@ -66,17 +72,11 @@ public class ShapelessRecipeGUIComponent extends RecipeGUIComponent{
         if(dialogSlot == null) {
             switch (button.id) {
                 case 0:
-                    RecipeData data = new RecipeData("Shapeless");
-                    GUIItemListDialogSlot output = (GUIItemListDialogSlot)components.remove(components.size() - 1);
+                    SmeltingRecipeData data = new SmeltingRecipeData();
+                    data.smeltingEXP = expCount.getText() == null ? 0.0f : (float)Integer.parseInt(expCount.getText()) / 100.0f;
                     data.itemInputs = new ArrayList<>();
                     data.itemOutputs = new ArrayList<>();
-                    for(GUIComponent comp : components){
-                        if(comp instanceof GUIItemListDialogSlot){
-                            GUIItemListDialogSlot slot = (GUIItemListDialogSlot)comp;
-                            if(!slot.isEmpty())
-                                data.itemInputs.add(slot.getItem());
-                        }
-                    }
+                    data.itemInputs.add(input.getItem());
                     data.itemOutputs.add(output.getItem());
                     data.register();
                     gui.returnToSelectScreen();
@@ -92,7 +92,8 @@ public class ShapelessRecipeGUIComponent extends RecipeGUIComponent{
     public void update(int mouseX, int mouseY) {
         if(dialogSlot == null) {
             super.update(mouseX, mouseY);
-            save.enabled = !outputSlot.isEmpty();
+            save.enabled = !output.isEmpty() && !input.isEmpty();
+            if(expCount.getText() != null && Integer.parseInt(expCount.getText()) > 100) expCount.setText("100");
             for (GUIComponent component : components) {
                 if (component instanceof GUIItemListDialogSlot) {
                     GUIItemListDialogSlot slot = (GUIItemListDialogSlot) component;
@@ -111,16 +112,39 @@ public class ShapelessRecipeGUIComponent extends RecipeGUIComponent{
     @Override
     public boolean keyTyped(char value, int keyCode) {
         if(dialogSlot == null)
-            return super.keyTyped(value, keyCode);
+            return expCount.keyTyped(value, keyCode) || super.keyTyped(value, keyCode);
         else
             return dialogSlot.keyTyped(value, keyCode);
     }
 
     @Override
     public void mousePressed(int mouseX, int mouseY, int mouseButton) {
-        if(dialogSlot == null)
-            super.mousePressed(mouseX, mouseY, mouseButton);
-        else
+        if(dialogSlot == null) {
+            if(!inventoryComponent.hasSelection())
+                super.mousePressed(mouseX, mouseY, mouseButton);
+            else {
+                for(GuiButton button : buttonList) {
+                    if(button.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)){
+                        button.func_146113_a(Minecraft.getMinecraft().getSoundHandler());
+                        actionPerformed(button);
+                        break;
+                    }
+                }
+                for(GUIComponent component : components){
+                    if(component instanceof GUIItemListDialogSlot) {
+                        if(component.contains(mouseX, mouseY)) {
+                            ItemStack item = null;
+                            if(mouseButton == 0) {
+                                item = inventoryComponent.getSelectedItem();
+                            }
+                            ((GUIItemListDialogSlot) component).setItem(item);
+                        }
+                    } else {
+                        component.mousePressed(mouseX, mouseY, mouseButton);
+                    }
+                }
+            }
+        } else
             dialogSlot.mousePressed(mouseX, mouseY, mouseButton);
     }
 

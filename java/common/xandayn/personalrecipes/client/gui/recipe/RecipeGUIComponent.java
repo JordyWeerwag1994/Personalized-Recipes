@@ -5,6 +5,7 @@ import common.xandayn.personalrecipes.client.gui.component.GUIComponent;
 import common.xandayn.personalrecipes.util.Rendering;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public abstract class RecipeGUIComponent {
     protected ResourceLocation texture;
     protected RecipeHandlerGUI gui;
     protected ArrayList<GuiButton> buttonList;
-    protected boolean remove;
+    protected EntityPlayer player;
 
     protected ArrayList<GUIComponent> components;
 
@@ -46,13 +47,13 @@ public abstract class RecipeGUIComponent {
         this.components = new ArrayList<>();
     }
 
-    public void initGUI(RecipeHandlerGUI gui, boolean remove) {
+    public void initGUI(RecipeHandlerGUI gui, EntityPlayer player) {
         buttonList.clear();
         components.clear();
-        this.remove = remove;
         this.gui = gui;
         this.guiLeft = (gui.width - this.xSize) / 2;
-        this.guiTop = (gui.height - this.ySize) / 2;
+        this.guiTop = gui.getGuiTop();
+        this.player = player;
     }
 
     public void renderBackground(int mouseX, int mouseY) {

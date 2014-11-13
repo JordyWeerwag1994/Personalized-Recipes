@@ -1,5 +1,6 @@
 package common.xandayn.personalrecipes.client.gui.component;
 
+import common.xandayn.personalrecipes.client.gui.RecipeHandlerGUI;
 import common.xandayn.personalrecipes.client.gui.component.dialog.GUIItemListDialog;
 import net.minecraft.client.gui.GuiButton;
 
@@ -31,10 +32,12 @@ public class GUIItemListDialogSlot extends GUISlot {
 
     private GUIItemListDialog dialog;
     public boolean wasOpen = false;
+    private boolean justCreated = true;
 
-    public GUIItemListDialogSlot(int x, int y, int dialogX, int dialogY, int stackLimit) {
-        super(x, y, stackLimit);
-        dialog = new GUIItemListDialog(dialogX, dialogY, stackLimit);
+    public GUIItemListDialogSlot(int x, int y, int dialogX, int dialogY, int stackLimit, RecipeHandlerGUI gui) {
+        super(x, y, stackLimit, gui);
+        dialog = new GUIItemListDialog(dialogX, dialogY, stackLimit, gui);
+        this.setActive(false);
     }
 
     public boolean isDialogOpen(){
@@ -43,7 +46,13 @@ public class GUIItemListDialogSlot extends GUISlot {
 
     @Override
     public void update(int mouseX, int mouseY) {
-        if(!isActive()) return;
+        if(!isActive()) {
+            if(justCreated) {
+                this.setActive(true);
+                justCreated = false;
+            }
+            return;
+        }
         if(!isDialogOpen()) {
             super.update(mouseX, mouseY);
             if(wasOpen) { //dialog was just closed
@@ -74,7 +83,9 @@ public class GUIItemListDialogSlot extends GUISlot {
 
     @Override
     public void mousePressed(int mouseX, int mouseY, int mouseButton) {
-        if(!isActive()) return;
+        if(!isActive()) {
+            return;
+        }
         if(!isDialogOpen()) {
             if(this.contains(mouseX, mouseY)) {
                 if (mouseButton == 0) {

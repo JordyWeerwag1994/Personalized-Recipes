@@ -41,7 +41,6 @@ public class FileHandler {
     private static File _WORKING_DIRECTORY;
     private static File _PLUGINS_DIRECTORY;
     private static File _DATA_DIRECTORY;
-//    private static File _NBT_SAVE_FILE;
 
     public static void initialize(){
         _WORKING_DIRECTORY = new File(FMLCommonHandler.instance().getSide().isClient() ? Minecraft.getMinecraft().mcDataDir.getAbsoluteFile() : FMLCommonHandler.instance().getMinecraftServerInstance().getFile(""), "Personalized_Recipes");

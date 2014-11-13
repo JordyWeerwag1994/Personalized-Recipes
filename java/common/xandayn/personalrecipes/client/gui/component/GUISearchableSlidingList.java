@@ -98,4 +98,9 @@ public class GUISearchableSlidingList extends GUISlidingList {
             updateSelections();
         }
     }
+
+    public void setSelected(String selected) {
+        searchBar.setText(selected);
+        updateSelections();
+    }
 }

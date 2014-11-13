@@ -36,13 +36,19 @@ import java.util.ArrayList;
  */
 public abstract class CustomRecipeHandler<T> {
 
-    private final RecipeGUIComponent guiComponent;
+    protected RecipeGUIComponent addGuiComponent;
+    protected RecipeGUIComponent removeGuiComponent;
 
     /**
-     * @param guiComponent The IRecipeGUIComponent to associate with this class.
+     * @param addGuiComponent The IRecipeGUIComponent to associate with this class.
      */
-    public CustomRecipeHandler(RecipeGUIComponent guiComponent){
-        this.guiComponent = guiComponent;
+    public CustomRecipeHandler(RecipeGUIComponent addGuiComponent){
+        this(addGuiComponent, null);
+    }
+
+    public CustomRecipeHandler(RecipeGUIComponent addGuiComponent, RecipeGUIComponent removeGuiComponent) {
+        this.addGuiComponent = addGuiComponent;
+        this.removeGuiComponent = removeGuiComponent;
     }
 
     /**
@@ -78,19 +84,13 @@ public abstract class CustomRecipeHandler<T> {
     public abstract void clear();
 
     /**
-     * @return True if non-custom recipes can be removed.
-     */
-    //TODO: Implement "vanilla" (non-custom) recipe removal and allow overwriting of this function
-    public final boolean allowVanillaRecipeRemoval() {
-        return false;
-    }
-
-    /**
      * @return The IRecipeGUIComponent associated with this CustomRecipeHandler
      *
      * @see common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent
      */
-    public final RecipeGUIComponent getGUIComponent() {
-        return guiComponent;
+    public RecipeGUIComponent getAddGUIComponent() {
+        return addGuiComponent;
     }
+
+    public RecipeGUIComponent getRemoveGUIComponent() { return removeGuiComponent; }
 }

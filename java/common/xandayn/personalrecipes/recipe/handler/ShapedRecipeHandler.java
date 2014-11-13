@@ -1,6 +1,7 @@
 package common.xandayn.personalrecipes.recipe.handler;
 
-import common.xandayn.personalrecipes.client.gui.recipe.ShapedRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.add.ShapedRecipeGUIComponent;
+import common.xandayn.personalrecipes.client.gui.recipe.remove.ShapedRecipeRemoveGUIComponent;
 import common.xandayn.personalrecipes.recipe.CustomRecipeHandler;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
 import common.xandayn.personalrecipes.recipe.data.ShapedRecipeData;
@@ -42,6 +43,7 @@ public class ShapedRecipeHandler extends CustomRecipeHandler<ShapedRecipes> {
     ArrayList<ShapedRecipes> recipes = new ArrayList<>();
     public ShapedRecipeHandler() {
         super(new ShapedRecipeGUIComponent());
+        this.removeGuiComponent = new ShapedRecipeRemoveGUIComponent(this);
     }
 
     @Override
@@ -119,9 +121,11 @@ public class ShapedRecipeHandler extends CustomRecipeHandler<ShapedRecipes> {
 
     @Override
     public void clear() {
-        for(int i = 0; i < recipes.size(); i++){
-            deleteRecipe(i);
+        int count = recipes.size();
+        for(int i = 0; i < count; i++){
+            deleteRecipe(0);
         }
+        recipes.clear();
     }
 
     /**

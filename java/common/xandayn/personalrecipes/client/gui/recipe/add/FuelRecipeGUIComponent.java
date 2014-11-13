@@ -1,16 +1,23 @@
-package common.xandayn.personalrecipes.client.gui.recipe;
+package common.xandayn.personalrecipes.client.gui.recipe.add;
 
 import common.xandayn.personalrecipes.client.gui.RecipeHandlerGUI;
+import common.xandayn.personalrecipes.client.gui.component.GUIComponent;
+import common.xandayn.personalrecipes.client.gui.component.GUIInventoryComponent;
 import common.xandayn.personalrecipes.client.gui.component.GUIItemListDialogSlot;
 import common.xandayn.personalrecipes.client.gui.component.GUITextField;
+import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.data.FuelRecipeData;
 import common.xandayn.personalrecipes.util.References;
 import common.xandayn.personalrecipes.util.Rendering;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @license
@@ -36,12 +43,13 @@ import java.util.ArrayList;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class FuelRecipeGUIComponent extends RecipeGUIComponent{
+public class FuelRecipeGUIComponent extends RecipeGUIComponent {
 
     private GUIItemListDialogSlot slot;
     private GuiButton save;
     private GuiButton cancel;
     private GUITextField textField;
+    private GUIInventoryComponent inventoryComponent;
 
     public FuelRecipeGUIComponent(){
         texture = new ResourceLocation(References.MOD_ID.toLowerCase(), "textures/gui/component/fuel_recipe_component.png");
@@ -50,10 +58,11 @@ public class FuelRecipeGUIComponent extends RecipeGUIComponent{
     }
 
     @Override
-    public void initGUI(RecipeHandlerGUI gui, boolean remove) {
-        super.initGUI(gui, remove);
+    public void initGUI(RecipeHandlerGUI gui, EntityPlayer player) {
+        super.initGUI(gui, player);
+        components.add(inventoryComponent = new GUIInventoryComponent(guiLeft - ((GUIInventoryComponent._TEXTURE_WIDTH / 2) - (xSize / 2)), guiTop + ySize, player, gui));
         components.add(textField = new GUITextField(guiLeft + 11, guiTop + 49, 50, 6, null));
-        components.add(slot = new GUIItemListDialogSlot(guiLeft + 11, guiTop + 11, guiLeft, guiTop, 1));
+        components.add(slot = new GUIItemListDialogSlot(guiLeft + 11, guiTop + 11, guiLeft, guiTop, 1, gui));
         buttonList.add(save = new GuiButton(0, guiLeft + 43, guiTop + 10, 32, 18, "Save"));
         buttonList.add(cancel = new GuiButton(1, guiLeft + 88, guiTop + 10, 32, 18, "Back"));
         textField.setAllowed(GUITextField.NUMERIC_ONLY);
@@ -79,8 +88,7 @@ public class FuelRecipeGUIComponent extends RecipeGUIComponent{
                 case 0:
                     FuelRecipeData data = new FuelRecipeData();
                     data.burnTime = Integer.parseInt(textField.getText());
-                    data.itemInputs = new ArrayList<>();
-                    data.itemInputs.add(slot.getItem());
+                    data.itemInputs = new ArrayList<>(Arrays.asList(slot.getItem()));
                     data.register();
                     gui.returnToSelectScreen();
                     break;
@@ -100,9 +108,36 @@ public class FuelRecipeGUIComponent extends RecipeGUIComponent{
 
     @Override
     public void mousePressed(int mouseX, int mouseY, int mouseButton) {
-        if(!slot.isDialogOpen())
-            super.mousePressed(mouseX, mouseY, mouseButton);
-        else
+//        if(!slot.isDialogOpen())
+//            super.mousePressed(mouseX, mouseY, mouseButton);
+//        else
+//            slot.mousePressed(mouseX, mouseY, mouseButton);
+        if(!slot.isDialogOpen()) {
+            if(!inventoryComponent.hasSelection())
+                super.mousePressed(mouseX, mouseY, mouseButton);
+            else {
+                for(GuiButton button : buttonList) {
+                    if(button.mousePressed(Minecraft.getMinecraft(), mouseX, mouseY)){
+                        button.func_146113_a(Minecraft.getMinecraft().getSoundHandler());
+                        actionPerformed(button);
+                        break;
+                    }
+                }
+                for(GUIComponent component : components){
+                    if(component instanceof GUIItemListDialogSlot) {
+                        if(component.contains(mouseX, mouseY)) {
+                            ItemStack item = null;
+                            if(mouseButton == 0) {
+                                item = inventoryComponent.getSelectedItem();
+                            }
+                            ((GUIItemListDialogSlot) component).setItem(item);
+                        }
+                    } else {
+                        component.mousePressed(mouseX, mouseY, mouseButton);
+                    }
+                }
+            }
+        } else
             slot.mousePressed(mouseX, mouseY, mouseButton);
     }
 

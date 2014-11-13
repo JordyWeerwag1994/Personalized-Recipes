@@ -1,5 +1,6 @@
 package common.xandayn.personalrecipes.client.gui.component;
 
+import common.xandayn.personalrecipes.client.gui.RecipeHandlerGUI;
 import common.xandayn.personalrecipes.util.Rendering;
 import net.minecraft.item.ItemStack;
 
@@ -29,14 +30,13 @@ public class GUISlot extends GUIComponent {
 
     private ItemStack item = null;
     private boolean active = true;
-    private int x, y;
+    private RecipeHandlerGUI gui;
     public int stackLimit;
 
-    public GUISlot(int x, int y, int stackLimit) {
+    public GUISlot(int x, int y, int stackLimit, RecipeHandlerGUI gui) {
         super(x, y, _GUI_SLOT_SIZE, _GUI_SLOT_SIZE);
-        this.x = x;
-        this.y = y;
         this.stackLimit = stackLimit;
+        this.gui = gui;
     }
 
     @Override
@@ -51,8 +51,11 @@ public class GUISlot extends GUIComponent {
 
     @Override
     public void renderForeground(int mouseX, int mouseY) {
-        if (item != null)
+        if (item != null) {
             Rendering.drawItem(x, y, item);
+            if(this.contains(mouseX, mouseY))
+                gui.render_tool_tip(item, mouseX, mouseY);
+        }
     }
 
     public void setItem(ItemStack item){

@@ -1,5 +1,6 @@
 package common.xandayn.personalrecipes.client.gui.component.dialog;
 
+import common.xandayn.personalrecipes.client.gui.RecipeHandlerGUI;
 import common.xandayn.personalrecipes.client.gui.component.GUISearchableSlidingList;
 import common.xandayn.personalrecipes.client.gui.component.GUISlot;
 import common.xandayn.personalrecipes.client.gui.component.GUITextField;
@@ -44,7 +45,7 @@ public class GUIItemListDialog extends GUIDialog<ItemStack> {
     ArrayList<ItemStack> items;
     ArrayList<String> names;
 
-    public GUIItemListDialog(int x, int y, int stackSize){
+    public GUIItemListDialog(int x, int y, int stackSize, RecipeHandlerGUI gui){
         super(x, y, 128, 86);
         this.stackSize = stackSize;
         items = Util.getAllItemsAndBlocks();
@@ -56,7 +57,7 @@ public class GUIItemListDialog extends GUIDialog<ItemStack> {
         itemList = new GUISearchableSlidingList(x + 4, y + 5, x + 79, y + 4, 44, names.toArray(new String[names.size()]));
         buttonList.add(submit = new GuiButton(1, x + 79, y + 53, 44, 14, "Submit"));
         buttonList.add(new GuiButton(2, x + 79, y + 68, 44, 14, "Cancel"));
-        slot = new GUISlot(x + 83, y + 20, stackSize);
+        slot = new GUISlot(x + 83, y + 20, stackSize, gui);
         itemCount = new GUITextField(x + 102, y + 21, 21, 2, null);
         itemCount.setAllowed(GUITextField.NUMERIC_ONLY);
     }
@@ -69,7 +70,7 @@ public class GUIItemListDialog extends GUIDialog<ItemStack> {
         itemCount.update(mouseX, mouseY);
         if(itemCount.getText() != null){
             int count = Integer.parseInt(itemCount.getText());
-            if(count > slot.getItem().getMaxStackSize())
+            if(!slot.isEmpty() && count > slot.getItem().getMaxStackSize())
                 itemCount.setText(String.valueOf(slot.getItem().getMaxStackSize()));
             else if(count > stackSize)
                 itemCount.setText(String.valueOf(stackSize));
