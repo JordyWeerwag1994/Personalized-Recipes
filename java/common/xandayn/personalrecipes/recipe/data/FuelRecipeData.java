@@ -1,5 +1,7 @@
 package common.xandayn.personalrecipes.recipe.data;
 
+import net.minecraft.nbt.NBTTagCompound;
+
 /**
  * @license
  * The MIT License (MIT)
@@ -30,5 +32,17 @@ public class FuelRecipeData extends RecipeData {
 
     public FuelRecipeData() {
         super("Fuel");
+    }
+
+    @Override
+    public void storeInNBT(NBTTagCompound tag) {
+        super.storeInNBT(tag);
+        tag.setInteger("burnTime", burnTime);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+        burnTime = tag.getInteger("burnTime");
     }
 }

@@ -106,5 +106,11 @@ public abstract class RecipeGUIComponent {
 
     public abstract void actionPerformed(GuiButton button);
 
-    public boolean keyTyped(char value, int keyCode) { return false; }
+    public boolean keyTyped(char value, int keyCode) {
+        for(GUIComponent component : components) {
+            if(component.keyTyped(value, keyCode))
+                return true;
+        }
+        return false;
+    }
 }

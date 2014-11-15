@@ -2,15 +2,17 @@ package common.xandayn.personalrecipes;
 
 import common.xandayn.personalrecipes.command.RecipeCommand;
 import common.xandayn.personalrecipes.common.GuiHandler;
+import common.xandayn.personalrecipes.common.NetworkHandler;
 import common.xandayn.personalrecipes.event.EventHandler;
 import common.xandayn.personalrecipes.io.FileHandler;
 import common.xandayn.personalrecipes.plugin.loading.PluginLoader;
+import common.xandayn.personalrecipes.recipe.handler.AnvilRecipeHandler;
 import common.xandayn.personalrecipes.util.References;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -43,6 +45,8 @@ import net.minecraftforge.common.MinecraftForge;
 @Mod(modid = References.MOD_ID, name = References.MOD_NAME, version = References.MOD_VERSION, dependencies = References.MOD_DEPENDENCIES)
 public class PersonalizedRecipes {
 
+    public static AnvilRecipeHandler ANVIL_RECIPE = new AnvilRecipeHandler();
+
     /**
      * The instance of PersonalizedRecipes created by Forge.
      */
@@ -55,13 +59,11 @@ public class PersonalizedRecipes {
     }
 
     @Mod.EventHandler
-    public void serverStopping(FMLServerStoppingEvent event){
-    }
-
-    @Mod.EventHandler
     public void preInitialization(FMLPreInitializationEvent event){
+        FMLCommonHandler.instance().bus().register(new EventHandler());
         MinecraftForge.EVENT_BUS.register(new EventHandler());
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
+        NetworkHandler.initialize();
         FileHandler.initialize();
         PluginLoader.loadPlugins();
     }

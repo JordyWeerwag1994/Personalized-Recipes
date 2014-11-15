@@ -73,7 +73,7 @@ public class ShapedRecipeHandler extends CustomRecipeHandler<ShapedRecipes> {
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tagCompound) {
+    public void writeRecipesToNBT(NBTTagCompound tagCompound) {
         NBTTagCompound shapeless = new NBTTagCompound();
         shapeless.setInteger("count",  recipes.size());
         for(int i = 0; i < recipes.size(); i++){
@@ -98,7 +98,8 @@ public class ShapedRecipeHandler extends CustomRecipeHandler<ShapedRecipes> {
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound tagCompound) {
+    public void readRecipesFromNBT(NBTTagCompound tagCompound) {
+        super.readRecipesFromNBT(tagCompound);
         if(tagCompound.hasKey("Shaped")) {
             NBTTagCompound shapeless = tagCompound.getCompoundTag("Shaped");
             int count = shapeless.getInteger("count");
@@ -120,7 +121,15 @@ public class ShapedRecipeHandler extends CustomRecipeHandler<ShapedRecipes> {
     }
 
     @Override
+    public void registerARecipeFromNBT(NBTTagCompound tagCompound) {
+        ShapedRecipeData data = new ShapedRecipeData();
+        data.readFromNBT(tagCompound);
+        registerRecipe(data);
+    }
+
+    @Override
     public void clear() {
+        super.clear();
         int count = recipes.size();
         for(int i = 0; i < count; i++){
             deleteRecipe(0);

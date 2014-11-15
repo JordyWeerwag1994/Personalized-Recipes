@@ -131,7 +131,6 @@ public class ShapedRecipeGUIComponent extends RecipeGUIComponent {
                         dialogSlot = slot;
                         break;
                     }
-
                 }
             }
         } else {

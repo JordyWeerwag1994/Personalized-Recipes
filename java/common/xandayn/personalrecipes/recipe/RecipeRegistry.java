@@ -1,5 +1,6 @@
 package common.xandayn.personalrecipes.recipe;
 
+import common.xandayn.personalrecipes.PersonalizedRecipes;
 import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
 import common.xandayn.personalrecipes.recipe.data.RecipeData;
 import common.xandayn.personalrecipes.recipe.handler.FuelRecipeHandler;
@@ -65,6 +66,7 @@ public class RecipeRegistry {
         registerRecipeHandler(new ShapelessRecipeHandler());
         registerRecipeHandler(new FuelRecipeHandler());
         registerRecipeHandler(new SmeltingRecipeHandler());
+        registerRecipeHandler(PersonalizedRecipes.ANVIL_RECIPE);
     }
 
     /**
@@ -158,14 +160,14 @@ public class RecipeRegistry {
         Set<String> keys = _RECIPE_HANDLERS.keySet();
         for(String key : keys){
             if(_RECIPE_HANDLERS.get(key).getRecipeCount() > 0)
-                _RECIPE_HANDLERS.get(key).writeToNBT(writeTag);
+                _RECIPE_HANDLERS.get(key).writeRecipesToNBT(writeTag);
         }
     }
 
     public void readAllRecipesFromNBT(NBTTagCompound readTag) {
         Set<String> keys = _RECIPE_HANDLERS.keySet();
         for(String key : keys){
-            _RECIPE_HANDLERS.get(key).readFromNBT(readTag);
+            _RECIPE_HANDLERS.get(key).readRecipesFromNBT(readTag);
         }
     }
 
@@ -179,5 +181,9 @@ public class RecipeRegistry {
 
     public int getRecipeCount(int id) {
         return _HANDLER_HASHES.containsKey(id) ? _RECIPE_HANDLERS.get(_HANDLER_HASHES.get(id)).getRecipeCount() : 0;
+    }
+
+    public void registerRecipeFromNBT(NBTTagCompound recipeData) {
+        _RECIPE_HANDLERS.get(recipeData.getString("recipeType")).registerARecipeFromNBT(recipeData);
     }
 }

@@ -4,9 +4,13 @@ import common.xandayn.personalrecipes.client.gui.RecipeHandlerGUI;
 import common.xandayn.personalrecipes.client.gui.component.GUISlot;
 import common.xandayn.personalrecipes.client.gui.component.GUITextField;
 import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
+import common.xandayn.personalrecipes.common.NetworkHandler;
+import common.xandayn.personalrecipes.common.packet.to_server.ServerRemoveOldRecipe;
+import common.xandayn.personalrecipes.recipe.RecipeRegistry;
 import common.xandayn.personalrecipes.recipe.data.SmeltingRecipeData;
 import common.xandayn.personalrecipes.recipe.handler.SmeltingRecipeHandler;
 import common.xandayn.personalrecipes.util.References;
+import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -63,7 +67,11 @@ public class SmeltingRecipeRemoveGUIComponent extends RecipeGUIComponent {
     public void actionPerformed(GuiButton button) {
         switch (button.id) {
             case 0:
-                handler.deleteRecipe(selected);
+                if(FMLCommonHandler.instance().getMinecraftServerInstance() == null) {
+                    NetworkHandler.NETWORK.sendToServer(new ServerRemoveOldRecipe(RecipeRegistry.INSTANCE.getAliasIntID(handler.getID()), selected));
+                } else {
+                    handler.deleteRecipe(selected);
+                }
                 gui.returnToSelectScreen();
                 break;
             case 1:

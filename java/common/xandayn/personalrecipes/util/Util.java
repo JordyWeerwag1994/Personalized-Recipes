@@ -1,8 +1,11 @@
 package common.xandayn.personalrecipes.util;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 
@@ -41,7 +44,10 @@ public class Util {
             items = new ArrayList<>();
             for (Object o : Item.itemRegistry) {
                 Item i = (Item) o;
-                i.getSubItems(i, i.getCreativeTab(), items);
+                if(FMLCommonHandler.instance().getSide().isClient())
+                    i.getSubItems(i, i.getCreativeTab(), items);
+                else
+                    items.add(new ItemStack(i));
             }
         }
         return items;
@@ -50,15 +56,15 @@ public class Util {
     public static Item getItemByUnlocalizedName(String unlocalizedName){
         ArrayList<ItemStack> items = getAllItemsAndBlocks();
         for(ItemStack item : items) {
-            if(item.getUnlocalizedName().equals(unlocalizedName))
+            if(item.getItem().getUnlocalizedName().equals(unlocalizedName))
                 return item.getItem();
         }
         return null;
     }
 
-    public static void writeItemStackToNBT(NBTTagCompound tag, ItemStack item){
+    public static void writeItemStackToNBT(NBTTagCompound tag, ItemStack item) {
         if(item != null) {
-            tag.setString("name", item.getUnlocalizedName());
+            tag.setString("name", item.getItem().getUnlocalizedName());
             tag.setInteger("damage", item.getItemDamage());
             tag.setInteger("count", item.stackSize);
             if(item.hasTagCompound())
@@ -80,5 +86,4 @@ public class Util {
         }
         return null;
     }
-
 }

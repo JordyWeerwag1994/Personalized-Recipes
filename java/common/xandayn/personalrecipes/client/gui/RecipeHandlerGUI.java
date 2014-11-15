@@ -256,7 +256,7 @@ public class RecipeHandlerGUI extends GuiContainer {
                     Rendering.drawString("Selected: " + slider.getSelected(), 32, 108, 0xFFDDDDDD);
                 }
 
-                Rendering.drawString(!removeMode.isChecked() ? "Remove" : "Add", 115, 24, 0xFFDDDDDD);
+                Rendering.drawString(!removeMode.isChecked() ? "Remove" : "Add", 122, 25, 0xFFDDDDDD);
                 GL11.glPushMatrix();
                 GL11.glTranslatef(-guiLeft, -guiTop, 0);
                 slider.renderForeground(mouseX, mouseY);

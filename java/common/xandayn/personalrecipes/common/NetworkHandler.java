@@ -1,8 +1,14 @@
 package common.xandayn.personalrecipes.common;
 
+import common.xandayn.personalrecipes.common.packet.to_client.ClientReceiveAllRecipesFromServer;
+import common.xandayn.personalrecipes.common.packet.to_client.ClientReceiveNewRecipeFromServer;
+import common.xandayn.personalrecipes.common.packet.to_client.ClientReceiveRecipeRemovalFromServer;
+import common.xandayn.personalrecipes.common.packet.to_server.ServerReceiveNewRecipe;
+import common.xandayn.personalrecipes.common.packet.to_server.ServerRemoveOldRecipe;
 import common.xandayn.personalrecipes.util.References;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.relauncher.Side;
 
 /**
  * @license
@@ -31,7 +37,12 @@ import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 public class NetworkHandler {
     public static SimpleNetworkWrapper NETWORK;
 
-    public static void iniitialize() {
+    public static void initialize() {
         NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(References.MOD_CHANNEL_ID);
+        NETWORK.registerMessage(ServerReceiveNewRecipe.Handler.class, ServerReceiveNewRecipe.class, 0, Side.SERVER);
+        NETWORK.registerMessage(ServerRemoveOldRecipe.Handler.class, ServerRemoveOldRecipe.class, 1, Side.SERVER);
+        NETWORK.registerMessage(ClientReceiveAllRecipesFromServer.Handler.class, ClientReceiveAllRecipesFromServer.class, 2, Side.CLIENT);
+        NETWORK.registerMessage(ClientReceiveNewRecipeFromServer.Handler.class, ClientReceiveNewRecipeFromServer.class, 3, Side.CLIENT);
+        NETWORK.registerMessage(ClientReceiveRecipeRemovalFromServer.Handler.class, ClientReceiveRecipeRemovalFromServer.class, 4, Side.CLIENT);
     }
 }

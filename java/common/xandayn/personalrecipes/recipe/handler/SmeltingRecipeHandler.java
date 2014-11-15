@@ -79,7 +79,7 @@ public class SmeltingRecipeHandler extends CustomRecipeHandler<SmeltingRecipeDat
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tagCompound) {
+    public void writeRecipesToNBT(NBTTagCompound tagCompound) {
         NBTTagCompound innerTag = new NBTTagCompound();
         innerTag.setInteger("count", data.size());
         for(int i = 0; i < data.size(); i++){
@@ -98,7 +98,8 @@ public class SmeltingRecipeHandler extends CustomRecipeHandler<SmeltingRecipeDat
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound tagCompound) {
+    public void readRecipesFromNBT(NBTTagCompound tagCompound) {
+        super.readRecipesFromNBT(tagCompound);
         if(tagCompound.hasKey("Smelting")) {
             NBTTagCompound smelting = tagCompound.getCompoundTag("Smelting");
             int count = smelting.getInteger("count");
@@ -119,7 +120,15 @@ public class SmeltingRecipeHandler extends CustomRecipeHandler<SmeltingRecipeDat
     }
 
     @Override
+    public void registerARecipeFromNBT(NBTTagCompound tagCompound) {
+        SmeltingRecipeData data = new SmeltingRecipeData();
+        data.readFromNBT(tagCompound);
+        registerRecipe(data);
+    }
+
+    @Override
     public void clear() {
+        super.clear();
         int count = data.size();
         for(int i = 0; i < count; i++){
             deleteRecipe(0);

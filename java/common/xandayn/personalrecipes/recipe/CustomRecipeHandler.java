@@ -77,11 +77,15 @@ public abstract class CustomRecipeHandler<T> {
      */
     public abstract int getRecipeCount();
 
-    public abstract void writeToNBT(NBTTagCompound tagCompound);
+    public abstract void writeRecipesToNBT(NBTTagCompound tagCompound);
+    public void readRecipesFromNBT(NBTTagCompound tagCompound) {
+        System.out.println("READING: " + getID());
+    }
+    public abstract void registerARecipeFromNBT(NBTTagCompound tagCompound);
 
-    public abstract void readFromNBT(NBTTagCompound tagCompound);
-
-    public abstract void clear();
+    public void clear() {
+        System.out.println("CLEARING " + getID());
+    }
 
     /**
      * @return The IRecipeGUIComponent associated with this CustomRecipeHandler

@@ -1,5 +1,7 @@
 package common.xandayn.personalrecipes.recipe.data;
 
+import net.minecraft.nbt.NBTTagCompound;
+
 /**
  * @license
  * The MIT License (MIT)
@@ -29,12 +31,16 @@ public class ShapedRecipeData extends RecipeData {
     /**
      * The width of the recipe (1-3)
      */
-    private final int width;
+    private int width;
 
     /**
      * The height of the recipe (1-3)
      */
-    private final int height;
+    private int height;
+
+    public ShapedRecipeData() {
+        this(-1, -1);
+    }
 
     /**
      * @param width The width of the recipe.
@@ -44,6 +50,20 @@ public class ShapedRecipeData extends RecipeData {
         super("Shaped");
         this.width = width;
         this.height = height;
+    }
+
+    @Override
+    public void storeInNBT(NBTTagCompound tag) {
+        super.storeInNBT(tag);
+        tag.setInteger("width", width);
+        tag.setInteger("height", height);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+        width = tag.getInteger("width");
+        height = tag.getInteger("height");
     }
 
     public int getWidth() {

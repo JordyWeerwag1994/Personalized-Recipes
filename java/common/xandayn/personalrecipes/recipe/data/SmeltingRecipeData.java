@@ -1,5 +1,7 @@
 package common.xandayn.personalrecipes.recipe.data;
 
+import net.minecraft.nbt.NBTTagCompound;
+
 /**
  * @license
  * The MIT License (MIT)
@@ -28,5 +30,17 @@ public class SmeltingRecipeData extends RecipeData {
     public float smeltingEXP;
     public SmeltingRecipeData() {
         super("Smelting");
+    }
+
+    @Override
+    public void storeInNBT(NBTTagCompound tag) {
+        super.storeInNBT(tag);
+        tag.setFloat("smeltingEXP", smeltingEXP);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+        smeltingEXP = tag.getFloat("smeltingEXP");
     }
 }

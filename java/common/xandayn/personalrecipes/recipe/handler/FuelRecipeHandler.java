@@ -78,7 +78,7 @@ public class FuelRecipeHandler extends CustomRecipeHandler<FuelRecipeData> imple
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tagCompound) {
+    public void writeRecipesToNBT(NBTTagCompound tagCompound) {
         NBTTagCompound fuel = new NBTTagCompound();
         fuel.setInteger("count", getRecipeCount());
         for(int i = 0; i < getRecipeCount(); i++) {
@@ -94,7 +94,8 @@ public class FuelRecipeHandler extends CustomRecipeHandler<FuelRecipeData> imple
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound tagCompound) {
+    public void readRecipesFromNBT(NBTTagCompound tagCompound) {
+        super.readRecipesFromNBT(tagCompound);
         if(tagCompound.hasKey("Fuel")){
             NBTTagCompound fuel = tagCompound.getCompoundTag("Fuel");
             int count = fuel.getInteger("count");
@@ -112,7 +113,13 @@ public class FuelRecipeHandler extends CustomRecipeHandler<FuelRecipeData> imple
     }
 
     @Override
+    public void registerARecipeFromNBT(NBTTagCompound tagCompound) {
+
+    }
+
+    @Override
     public void clear() {
+        super.clear();
         recipes.clear();
     }
 

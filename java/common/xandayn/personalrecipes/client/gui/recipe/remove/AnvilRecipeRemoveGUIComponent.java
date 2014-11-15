@@ -1,65 +1,61 @@
 package common.xandayn.personalrecipes.client.gui.recipe.remove;
 
 import common.xandayn.personalrecipes.client.gui.RecipeHandlerGUI;
+import common.xandayn.personalrecipes.client.gui.component.GUIItemListDialogSlot;
 import common.xandayn.personalrecipes.client.gui.component.GUISlot;
+import common.xandayn.personalrecipes.client.gui.component.GUITextField;
 import common.xandayn.personalrecipes.client.gui.recipe.RecipeGUIComponent;
 import common.xandayn.personalrecipes.common.NetworkHandler;
 import common.xandayn.personalrecipes.common.packet.to_server.ServerRemoveOldRecipe;
 import common.xandayn.personalrecipes.recipe.RecipeRegistry;
-import common.xandayn.personalrecipes.recipe.handler.ShapelessRecipeHandler;
+import common.xandayn.personalrecipes.recipe.data.AnvilRecipeData;
+import common.xandayn.personalrecipes.recipe.handler.AnvilRecipeHandler;
 import common.xandayn.personalrecipes.util.References;
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.ResourceLocation;
 
-public class ShapelessRecipeRemoveGUIComponent extends RecipeGUIComponent{
+public class AnvilRecipeRemoveGUIComponent extends RecipeGUIComponent {
 
+    AnvilRecipeHandler handler;
+    private GUITextField recipeCost;
+    private GUISlot input1, input2, output;
     private GuiButton nextPage, lastPage;
-    private GUISlot[] inputs;
-    private GUISlot output;
-    private int selected = 0;
+    private int selected;
     private int pageCount;
-    private ShapelessRecipeHandler handler;
 
-    public ShapelessRecipeRemoveGUIComponent(ShapelessRecipeHandler handler){
-        texture = new ResourceLocation(References.MOD_ID.toLowerCase(), "textures/gui/component/recipe_component.png");
+    public AnvilRecipeRemoveGUIComponent(AnvilRecipeHandler handler) {
+        this.handler = handler;
+        texture = new ResourceLocation(References.MOD_ID.toLowerCase(), "textures/gui/component/anvil_component.png");
         this.xSize = 128;
         this.ySize = 86;
-        this.handler = handler;
     }
 
     @Override
     public void initGUI(RecipeHandlerGUI gui, EntityPlayer player) {
         super.initGUI(gui, player);
+        components.add(recipeCost = new GUITextField(guiLeft + 98, guiTop + 65, 18, 2, "1"));
+        components.add(input1 = new GUIItemListDialogSlot(guiLeft + 13, guiTop + 35, guiLeft, guiTop, 64, gui));
+        components.add(input2 = new GUIItemListDialogSlot(guiLeft + 49, guiTop + 35, guiLeft, guiTop, 64, gui));
+        components.add(output = new GUIItemListDialogSlot(guiLeft + 99, guiTop + 35, guiLeft, guiTop, 64, gui));
+        recipeCost.setAllowed(GUITextField.NUMERIC_ONLY);
+        buttonList.add(new GuiButton(0, guiLeft + 12, guiTop + 7, 36, 20, "Delete"));
+        buttonList.add(new GuiButton(1, guiLeft + 80, guiTop + 7, 36, 20, "Back"));
+        buttonList.add(lastPage = new GuiButton(2, guiLeft - 10, guiTop + 38, 10, 10, "<"));
+        buttonList.add(nextPage = new GuiButton(3, guiLeft + xSize, guiTop + 38, 10, 10, ">"));
+        recipeCost.setEnabled(false);
         selected = 0;
-        this.inputs = new GUISlot[9];
-        for(int i = 0; i < inputs.length; i++) {
-            int x = i % 3;
-            int y = i / 3;
-            int bufferX = x * 2;
-            int bufferY = y * 2;
-            components.add(inputs[i] = new GUISlot(20 + (16 * x) + bufferX + guiLeft, 17 + (16 * y) + bufferY + guiTop, 1, gui));
-        }
-        components.add(output = new GUISlot(92 + guiLeft, 35 + guiTop, 64, gui));
-        buttonList.add(new GuiButton(0, guiLeft + 81, guiTop + 16, 32, 16, "Remove"));
-        buttonList.add(lastPage = new GuiButton(1, guiLeft + 5, guiTop + 38, 10, 10, "<"));
-        buttonList.add(nextPage = new GuiButton(2, guiLeft + 112, guiTop + 38, 10, 10, ">"));
-        buttonList.add(new GuiButton(3, guiLeft + 81, guiTop + 54, 32, 16, "Back"));
-        lastPage.enabled = nextPage.enabled = false;
         pageCount = handler.getRecipeCount();
         updateRecipe();
     }
 
     private void updateRecipe() {
-        ShapelessRecipes data = handler.getRecipes().get(selected);
-        for(int i = 0; i < data.recipeItems.size(); i++) {
-            inputs[i].setItem(null);
-            inputs[i].setItem(data.recipeItems.get(i) == null ? null : ((ItemStack)data.recipeItems.get(i)).copy());
-        }
-        output.setItem(data.getRecipeOutput().copy());
+        AnvilRecipeData data = handler.getRecipes().get(selected);
+        input1.setItem(data.itemInputs.get(0));
+        input2.setItem(data.itemInputs.get(1));
+        output.setItem(data.itemOutputs.get(0));
+        recipeCost.setText(String.valueOf(data.recipeCost));
     }
 
     @Override
@@ -81,21 +77,21 @@ public class ShapelessRecipeRemoveGUIComponent extends RecipeGUIComponent{
                 gui.returnToSelectScreen();
                 break;
             case 1:
+                gui.returnToSelectScreen();
+                break;
+            case 2:
                 selected--;
                 if(selected < 0) {
                     selected = 0;
                 }
                 updateRecipe();
                 break;
-            case 2:
+            case 3:
                 selected++;
                 if(selected > pageCount) {
                     selected = pageCount;
                 }
                 updateRecipe();
-                break;
-            case 3:
-                gui.returnToSelectScreen();
                 break;
         }
     }
